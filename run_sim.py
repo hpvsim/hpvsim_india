@@ -71,10 +71,10 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
     }
 
     pars['genotype_pars'] = dict(
-        hpv16=dict(dur_episomal=dict(dist='lognormal', par1=2.7, par2=1)),
-        hpv18=dict(dur_episomal=dict(dist='lognormal', par1=2.7, par2=0.5)),
-        hi5=dict(dur_episomal=dict(dist='lognormal', par1=3.0, par2=0.25)),
-        ohr=dict(dur_episomal=dict(dist='lognormal', par1=3.0, par2=0.25))
+        hpv16=dict(dur_episomal=dict(dist='lognormal', par1=38, par2=1500)),
+        hpv18=dict(dur_episomal=dict(dist='lognormal', par1=19, par2=730)),
+        hi5=dict(dur_episomal=dict(dist='lognormal', par1=22, par2=2000)),
+        ohr=dict(dur_episomal=dict(dist='lognormal', par1=22, par2=2000))
     )
 
     # If calibration parameters have been supplied, use them here
@@ -82,7 +82,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
         pars = sc.mergedicts(pars, calib_pars)
 
     # Create the sim
-    sim = hpv.Sim(pars=pars, datafile=datafile, rand_seed=seed)
+    sim = hpv.Sim(pars=pars, datafile=datafile, analyzers=analyzers, rand_seed=seed)
 
     return sim
 

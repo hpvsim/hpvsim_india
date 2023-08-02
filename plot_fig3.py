@@ -237,7 +237,7 @@ def plot_nh(sim=None):
 if __name__ == '__main__':
 
     location = 'india'
-    make_sim = False
+    make_sim = True
     if make_sim:
         calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
         sim = rs.run_sim(calib_pars=None, analyzers=ut.dwelltime_by_genotype(), do_save=True)  # Run the simulation
