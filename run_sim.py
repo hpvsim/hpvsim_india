@@ -16,12 +16,10 @@ os.environ.update(
 import numpy as np
 import sciris as sc
 import hpvsim as hpv
-import pandas as pd
-import seaborn as sns
-import pylab as pl
 
 # Imports from this repository
 import behavior_inputs as bi
+import utils as ut
 
 # %% Settings and filepaths
 
@@ -32,7 +30,7 @@ do_shrink = True  # Do not keep people when running sims (saves memory)
 # Run settings
 n_trials    = [1000, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 4][debug]    # How many cores to use
-storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug] # Storage for calibrations
+storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
 # Save settings
 do_save = True
@@ -40,7 +38,7 @@ save_plots = True
 
 
 # %% Simulation creation functions
-def make_sim(calib_pars=None, debug=0, datafile=None, seed=1):
+def make_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1):
     ''' Define parameters, analyzers, and interventions for the simulation -- not the sim itself '''
 
     pars = dict(
@@ -66,23 +64,29 @@ def make_sim(calib_pars=None, debug=0, datafile=None, seed=1):
         verbose=0.0,
     )
 
+    pars['genotype_pars']['hpv16']['dur_episomal'] = dict(dist='lognormal', par1=2.7, par2=1)
+    pars['genotype_pars']['hpv18']['dur_episomal'] = dict(dist='lognormal', par1=2.7, par2=0.5)
+    pars['genotype_pars']['hi5']['dur_episomal'] = dict(dist='lognormal', par1=3.0, par2=0.25)
+    pars['genotype_pars']['ohr']['dur_episomal'] = dict(dist='lognormal', par1=3.0, par2=0.25)
+
     # If calibration parameters have been supplied, use them here
     if calib_pars is not None:
         pars = sc.mergedicts(pars, calib_pars)
 
     # Create the sim
-    sim = hpv.Sim(pars=pars, datafile=datafile, rand_seed=seed)
+    sim = hpv.Sim(pars=pars, analyzers=analyzers, datafile=datafile, rand_seed=seed)
 
     return sim
 
 
 # %% Simulation running functions
-def run_sim(calib_pars=None, debug=0, datafile=None, seed=1, verbose=.1, do_save=False):
+def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, verbose=.1, do_save=False):
     # Make sim
     sim = make_sim(
         debug=debug,
         seed=seed,
         datafile=datafile,
+        analyzers=analyzers,
         calib_pars=calib_pars
     )
     sim.label = f'Sim--{seed}'
@@ -183,12 +187,12 @@ if __name__ == '__main__':
     T = sc.timer()  # Start a timer
 
     if 'run_sim' in to_run:
-        # calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
-        sim = run_sim(calib_pars=None)  # Run the simulation
+        calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
+        sim = run_sim(calib_pars=None, analyzers=ut.dwelltime_by_genotype())  # Run the simulation
         sim.plot()  # Plot the simulation
 
     if 'run_calib' in to_run:
-        sim, calib = run_calib(n_trials=n_trials, n_workers=n_workers, do_save=do_save, filestem='')
+        sim, calib = run_calib(n_trials=n_trials, n_workers=n_workers, filestem='', do_save=True)
 
     if 'plot_calib' in to_run:
         calib = plot_calib(save_pars=True, filestem='')
