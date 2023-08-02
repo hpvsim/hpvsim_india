@@ -64,10 +64,18 @@ def make_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1):
         verbose=0.0,
     )
 
-    pars['genotype_pars']['hpv16']['dur_episomal'] = dict(dist='lognormal', par1=2.7, par2=1)
-    pars['genotype_pars']['hpv18']['dur_episomal'] = dict(dist='lognormal', par1=2.7, par2=0.5)
-    pars['genotype_pars']['hi5']['dur_episomal'] = dict(dist='lognormal', par1=3.0, par2=0.25)
-    pars['genotype_pars']['ohr']['dur_episomal'] = dict(dist='lognormal', par1=3.0, par2=0.25)
+    genotype_pars = {
+        16: {
+            'sev_fn': dict(form='logf2', k=0.25, x_infl=0, ttc=30)
+        }
+    }
+
+    pars['genotype_pars'] = dict(
+        hpv16=dict(dur_episomal=dict(dist='lognormal', par1=2.7, par2=1)),
+        hpv18=dict(dur_episomal=dict(dist='lognormal', par1=2.7, par2=0.5)),
+        hi5=dict(dur_episomal=dict(dist='lognormal', par1=3.0, par2=0.25)),
+        ohr=dict(dur_episomal=dict(dist='lognormal', par1=3.0, par2=0.25))
+    )
 
     # If calibration parameters have been supplied, use them here
     if calib_pars is not None:
