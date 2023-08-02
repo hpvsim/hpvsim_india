@@ -38,7 +38,7 @@ save_plots = True
 
 
 # %% Simulation creation functions
-def make_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1):
+def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
     ''' Define parameters, analyzers, and interventions for the simulation -- not the sim itself '''
 
     pars = dict(
@@ -82,7 +82,7 @@ def make_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1):
         pars = sc.mergedicts(pars, calib_pars)
 
     # Create the sim
-    sim = hpv.Sim(pars=pars, analyzers=analyzers, datafile=datafile, rand_seed=seed)
+    sim = hpv.Sim(pars=pars, datafile=datafile, rand_seed=seed)
 
     return sim
 
