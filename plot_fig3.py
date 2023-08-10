@@ -213,7 +213,7 @@ def plot_nh(sim=None):
         gen += [genotype.upper()] * len(a.dwelltime['total'][gi])
     dd['genotype'] = gen
     dd['dwelltime'] = dw
-    sns.violinplot(data=dd, x="genotype", y="dwelltime", ax=axes[5], palette=colors)
+    sns.boxplot(data=dd, x="genotype", y="dwelltime", ax=axes[5], palette=colors, showfliers=False)
     axes[5].set_xlabel('')
     axes[5].set_ylabel('')
     axes[5].set_ylabel("Years")
@@ -237,7 +237,7 @@ def plot_nh(sim=None):
 if __name__ == '__main__':
 
     location = 'india'
-    make_sim = True
+    make_sim = False
     if make_sim:
         calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
         sim = rs.run_sim(calib_pars=None, analyzers=ut.dwelltime_by_genotype(), do_save=True)  # Run the simulation
