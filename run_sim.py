@@ -28,7 +28,7 @@ debug = 0  # Run with smaller population sizes and in serial
 do_shrink = True  # Do not keep people when running sims (saves memory)
 
 # Run settings
-n_trials    = [1000, 2][debug]  # How many trials to run for calibration
+n_trials    = [3000, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 4][debug]    # How many cores to use
 storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
@@ -189,8 +189,8 @@ if __name__ == '__main__':
     # List of what to run
     to_run = [
         # 'run_sim',
-        # 'run_calib',
-        'plot_calib'
+        'run_calib',
+        # 'plot_calib'
     ]
 
     T = sc.timer()  # Start a timer
