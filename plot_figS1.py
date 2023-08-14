@@ -22,7 +22,7 @@ def annotate_axes(ax, text, fontsize=18):
 def plot_calib(calib, res_to_plot=100):
 
     ut.set_font(size=16)
-    fig = pl.figure(layout="tight", figsize=(20, 10))
+    fig = pl.figure(layout="tight", figsize=(10, 7))
     prev_col = '#5f5cd2'
     canc_col = '#c1981d'
     ms = 80
@@ -81,8 +81,10 @@ def plot_calib(calib, res_to_plot=100):
 
     # Data
     datadf = calib.target_data[1]
-    age_labels = ['0-14', '15-20', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60-64',
-                  '65-69', '70-74', '75-79', '80-84', '85+']
+    # age_labels = ['0-14', '15-20', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60-64',
+    #               '65-69', '70-74', '75-79', '80-84', '85+']
+    # age_labels = ['', '15-20', '', '25-29', '', '35-39', '', '45-49', '', '55-59', '', '65-69', '', '75-79', '', '85+']
+    age_labels = ['0', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60', '65', '70', '75', '80', '85']
     x = np.arange(len(age_labels))
     best = datadf.value.values
 
