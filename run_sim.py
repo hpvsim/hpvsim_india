@@ -1,5 +1,5 @@
 '''
-Define an HPVsim simulation for Ethiopia
+Define an HPVsim simulation for India
 '''
 
 # Standard imports
@@ -176,7 +176,7 @@ def plot_calib(which_pars=0, save_pars=True, filestem=''):
         trial_pars = sc.autolist()
         for i in range(100):
             trial_pars += calib.trial_pars_to_sim_pars(which_pars=i)
-        sc.save(f'results//india_pars{filestem}.obj', calib_pars)
+        sc.save(f'results/india_pars{filestem}.obj', calib_pars)
         sc.save(f'results/india_pars{filestem}_all.obj', trial_pars)
 
     return calib
