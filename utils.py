@@ -29,7 +29,6 @@ def lognorm_params(par1, par2):
     return shape, scale
 
 
-
 class dwelltime_by_genotype(hpv.Analyzer):
     '''
     Determine the age at which people with cervical cancer were causally infected and
@@ -46,10 +45,14 @@ class dwelltime_by_genotype(hpv.Analyzer):
         self.years = sim.yearvec
         if self.start_year is None:
             self.start_year = sim['start']
-        self.age_causal = []
-        self.age_cancer = []
+        self.age_causal = dict()
+        self.age_cancer = dict()
         self.dwelltime = dict()
-        for state in ['precin', 'cin1', 'cin2', 'cin3', 'total']:
+        self.median_age_causal = dict()
+        for gtype in range(sim['n_genotypes']):
+            self.age_causal[gtype] = []
+            self.age_cancer[gtype] = []
+        for state in ['precin', 'cin', 'total']:
             self.dwelltime[state] = dict()
             for gtype in range(sim['n_genotypes']):
                 self.dwelltime[state][gtype] = []
@@ -60,25 +63,19 @@ class dwelltime_by_genotype(hpv.Analyzer):
             if len(cancer_inds):
                 current_age = sim.people.age[cancer_inds]
                 date_exposed = sim.people.date_exposed[cancer_genotypes, cancer_inds]
-                date_cin1 = sim.people.date_cin1[cancer_genotypes, cancer_inds]
-                date_cin2 = sim.people.date_cin2[cancer_genotypes, cancer_inds]
-                date_cin3 = sim.people.date_cin3[cancer_genotypes, cancer_inds]
-                hpv_time = (date_cin1 - date_exposed) * sim['dt']
-                cin1_time = (date_cin2 - date_cin1) * sim['dt']
-                cin2_time = (date_cin3 - date_cin2) * sim['dt']
-                cin3_time = (sim.t - date_cin3) * sim['dt']
+                dur_precin = sim.people.dur_precin[cancer_genotypes, cancer_inds]
+                dur_cin = sim.people.dur_cin[cancer_genotypes, cancer_inds]
                 total_time = (sim.t - date_exposed) * sim['dt']
-                self.age_causal += (current_age - total_time).tolist()
-                self.age_cancer += current_age.tolist()
                 for gtype in range(sim['n_genotypes']):
                     gtype_inds = hpv.true(cancer_genotypes == gtype)
-                    self.dwelltime['precin'][gtype] += hpv_time[gtype_inds].tolist()
-                    self.dwelltime['cin1'][gtype] += cin1_time[gtype_inds].tolist()
-                    self.dwelltime['cin2'][gtype] += cin2_time[gtype_inds].tolist()
-                    self.dwelltime['cin3'][gtype] += cin3_time[gtype_inds].tolist()
+                    self.dwelltime['precin'][gtype] += dur_precin[gtype_inds].tolist()
+                    self.dwelltime['cin'][gtype] += dur_cin[gtype_inds].tolist()
                     self.dwelltime['total'][gtype] += total_time[gtype_inds].tolist()
+                    self.age_causal[gtype] += (current_age[gtype_inds] - total_time[gtype_inds]).tolist()
+                    self.age_cancer[gtype] += (current_age[gtype_inds]).tolist()
         return
 
     def finalize(self, sim=None):
-        super().initialize(sim)
-
+        ''' Convert things to arrays '''
+        for gtype in range(sim['n_genotypes']):
+            self.median_age_causal[gtype] = np.quantile(self.age_causal[gtype], 0.5)

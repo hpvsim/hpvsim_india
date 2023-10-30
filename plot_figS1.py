@@ -137,7 +137,7 @@ def plot_calib(calib, res_to_plot=100):
         ax.set_xlabel('')
         ax.set_title(rlabels[ai])
 
-    pl.savefig(f"figures/figS1.png", dpi=100)
+    pl.savefig(f"figures/figS1.png", dpi=300)
     pl.show()
 
     return
