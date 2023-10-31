@@ -25,9 +25,13 @@ layer_probs = dict(
 
 
 #%% PARTNERS
-partners = dict(
-    m=dict(dist='poisson', par1=0.1),
-    c=dict(dist='poisson', par1=0.5),
+m_partners = dict(
+    m=dict(dist='poisson1', par1=0.01),
+    c=dict(dist='poisson1', par1=0.2),
+)
+f_partners = dict(
+    m=dict(dist='poisson1', par1=0.01),
+    c=dict(dist='neg_binomial', par1=0.4, par2=0.01),
 )
 
 #%% MIXING
@@ -52,5 +56,5 @@ mixing_all = np.array([
 ])
 
 mixing = dict()
-for k in ['m','c']: mixing[k] = mixing_all
+for k in ['m', 'c']: mixing[k] = mixing_all
 

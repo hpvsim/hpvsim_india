@@ -53,7 +53,8 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
                    m=dict(dist='lognormal', par1=17.0, par2=2.)),
         mixing=bi.mixing,
         layer_probs=bi.layer_probs,
-        partners=bi.partners,
+        m_partners=bi.m_partners,
+        f_partners=bi.f_partners,
         init_hpv_dist=dict(hpv16=0.4, hpv18=0.15, hi5=0.15, ohr=0.3),
         init_hpv_prev={
             'age_brackets': np.array([12, 17, 24, 34, 44, 64, 80, 150]),
@@ -110,30 +111,26 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
 
     # Define the calibration parameters
     calib_pars = dict(
-        beta=[0.05, 0.02, 0.5, 0.01],
+        beta=[0.2, 0.1, 0.5, 0.02],
     )
     genotype_pars = dict(
         hpv16=dict(
             dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
-            cin_fn=dict(k=[0.25, 0.1, 0.4, 0.01]),
             cancer_fn=dict(ld50=[15, 12, 40, 1]),
         ),
         hpv18=dict(
             dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
-            cin_fn=dict(k=[0.25, 0.1, 0.4, 0.01]),
             cancer_fn=dict(ld50=[15, 12, 40, 1]),
             rel_beta=[0.75, 0.7, 1., 0.05]
         ),
         hi5=dict(
             dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
-            cin_fn=dict(k=[0.1, 0.05, 0.3, 0.01]),
-            cancer_fn=dict(ld50=[20, 15, 30, 1]),
+            cancer_fn=dict(ld50=[15, 12, 40, 1]),
             rel_beta=[0.75, 0.7, 1., 0.05]
         ),
         ohr=dict(
             dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
-            cin_fn=dict(k=[0.1, 0.05, 0.3, 0.01]),
-            cancer_fn=dict(ld50=[20, 15, 30, 1]),
+            cancer_fn=dict(ld50=[15, 12, 40, 1]),
             rel_beta=[0.75, 0.7, 1., 0.05]
         ),
     )
