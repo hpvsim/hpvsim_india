@@ -24,7 +24,7 @@ import utils as ut
 # %% Settings and filepaths
 
 # Debug switch
-debug = 1  # Run with smaller population sizes and in serial
+debug = 0  # Run with smaller population sizes and in serial
 do_shrink = True  # Do not keep people when running sims (saves memory)
 
 # Run settings
