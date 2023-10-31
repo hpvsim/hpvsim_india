@@ -28,7 +28,7 @@ debug = 0  # Run with smaller population sizes and in serial
 do_shrink = True  # Do not keep people when running sims (saves memory)
 
 # Run settings
-n_trials    = [1000, 2][debug]  # How many trials to run for calibration
+n_trials    = [1600, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 4][debug]    # How many cores to use
 storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
@@ -104,8 +104,7 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
     datafiles = [
         f'data/india_hpv_prevalence.csv',
         f'data/india_cancer_cases.csv',
-        f'data/india_cin1_types.csv',
-        f'data/india_cin3_types.csv',
+        f'data/india_cin_types.csv',
         f'data/india_cancer_types.csv',
     ]
 
@@ -115,20 +114,27 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
     )
     genotype_pars = dict(
         hpv16=dict(
-            transform_prob=[10e-10, 4e-10, 20e-10, 1e-10],
-            sev_fn=dict(k=[0.25, 0.15, 0.4, 0.05]),
+            dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
+            cin_fn=dict(k=[0.25, 0.1, 0.4, 0.01]),
+            cancer_fn=dict(ld50=[15, 12, 40, 1]),
         ),
         hpv18=dict(
-            transform_prob=[6e-10, 4e-10, 10e-10, 1e-10],
-            sev_fn=dict(k=[0.2, 0.1, 0.35, 0.05]),
+            dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
+            cin_fn=dict(k=[0.25, 0.1, 0.4, 0.01]),
+            cancer_fn=dict(ld50=[15, 12, 40, 1]),
+            rel_beta=[0.75, 0.7, 1., 0.05]
         ),
         hi5=dict(
-                transform_prob=[3e-10, 2e-10, 5e-10, 1e-10],
-                sev_fn=dict(k=[0.05, 0.04, 0.2, 0.01]),
-            ),
+            dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
+            cin_fn=dict(k=[0.1, 0.05, 0.3, 0.01]),
+            cancer_fn=dict(ld50=[20, 15, 30, 1]),
+            rel_beta=[0.75, 0.7, 1., 0.05]
+        ),
         ohr=dict(
-            transform_prob=[3e-10, 2e-10, 5e-10, 1e-10],
-            sev_fn=dict(k=[0.05, 0.04, 0.2, 0.01]),
+            dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
+            cin_fn=dict(k=[0.1, 0.05, 0.3, 0.01]),
+            cancer_fn=dict(ld50=[20, 15, 30, 1]),
+            rel_beta=[0.75, 0.7, 1., 0.05]
         ),
     )
 
@@ -174,8 +180,8 @@ if __name__ == '__main__':
 
     # List of what to run
     to_run = [
-        'run_sim',
-        # 'run_calib',
+        # 'run_sim',
+        'run_calib',
         # 'plot_calib'
     ]
 
