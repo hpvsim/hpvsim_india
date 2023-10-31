@@ -180,8 +180,8 @@ if __name__ == '__main__':
 
     # List of what to run
     to_run = [
-        'run_sim',
-        # 'run_calib',
+        # 'run_sim',
+        'run_calib',
         # 'plot_calib'
     ]
 
