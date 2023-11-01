@@ -49,12 +49,15 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
         network='default',
         genotypes=[16, 18, 'hi5', 'ohr'],
         location='india',
-        debut=dict(f=dict(dist='lognormal', par1=14.8, par2=2.),
-                   m=dict(dist='lognormal', par1=17.0, par2=2.)),
+        debut=dict(f=dict(dist='lognormal', par1=15., par2=2.),
+                   m=dict(dist='lognormal', par1=20., par2=2.)),
         mixing=bi.mixing,
         layer_probs=bi.layer_probs,
         m_partners=bi.m_partners,
         f_partners=bi.f_partners,
+        dur_pship=dict(m=dict(dist='lognormal', par1=50, par2=10),
+                       c=dict(dist='lognormal', par1=1, par2=1)),
+        cross_layer=0.95,
         init_hpv_dist=dict(hpv16=0.4, hpv18=0.15, hi5=0.15, ohr=0.3),
         init_hpv_prev={
             'age_brackets': np.array([12, 17, 24, 34, 44, 64, 80, 150]),
@@ -90,7 +93,7 @@ def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, ver
     # Run
     sim['verbose'] = verbose
     sim.run()
-    sim.shrink()
+    # sim.shrink()
 
     # Optinally save
     if do_save:

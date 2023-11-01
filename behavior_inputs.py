@@ -12,26 +12,26 @@ layer_probs = dict(
     m=np.array([
         # Share of females (row 1) and males (row 2) of each age who are married
         [0, 5,  10,    15,   20,   25,   30,   35,   40,   45,   50,   55,   60,   65,   70,   75],  # Age bracket
-        [0, 0, 0.05, 0.25, 0.50, 0.60, 0.95, 0.70, 0.75, 0.65, 0.55, 0.40, 0.40, 0.40, 0.40, 0.40],  # Share f
-        [0, 0, 0.01, 0.05, 0.10, 0.50, 0.60, 0.70, 0.70, 0.70, 0.70, 0.80, 0.70, 0.60, 0.50, 0.60]]  # Share m
+        [0, 0, 0.05, 0.25, 0.60, 0.90, 0.95, 0.70, 0.75, 0.65, 0.55, 0.40, 0.40, 0.40, 0.40, 0.40],  # Share f
+        [0, 0, 0.01, 0.05, 0.10, 0.90, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60]]  # Share m
     ),
     c=np.array([
         # Share of females (row 1) and males (row 2) of each age having casual relationships
         [0, 5,   10,   15,   20,   25,   30,   35,   40,   45,   50,   55,   60,   65,   70,   75],  # Age bracket
-        [0, 0, 0.10, 0.70, 0.80, 0.60, 0.60, 0.50, 0.20, 0.05, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],  # Share f
-        [0, 0, 0.05, 0.70, 0.80, 0.60, 0.60, 0.50, 0.50, 0.40, 0.30, 0.10, 0.05, 0.01, 0.01, 0.01]],  # Share m
+        [0, 0, 0.10, 0.10, 0.10, 0.20, 0.30, 0.30, 0.40, 0.25, 0.20, 0.20, 0.05, 0.01, 0.01, 0.01],  # Share f
+        [0, 0, 0.05, 0.20, 0.20, 0.20, 0.50, 0.60, 0.60, 0.50, 0.40, 0.30, 0.10, 0.10, 0.10, 0.10]],  # Share m
     ),
 )
 
 
 #%% PARTNERS
 m_partners = dict(
-    m=dict(dist='poisson1', par1=0.01),
-    c=dict(dist='poisson1', par1=0.2),
+    m=dict(dist='poisson1', par1=0.001),
+    c=dict(dist='poisson1', par1=10),
 )
 f_partners = dict(
-    m=dict(dist='poisson1', par1=0.01),
-    c=dict(dist='neg_binomial', par1=0.4, par2=0.01),
+    m=dict(dist='poisson1', par1=0.001),
+    c=dict(dist='neg_binomial', par1=10, par2=0.1),
 )
 
 #%% MIXING
