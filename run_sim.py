@@ -106,7 +106,7 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
 
     sim = make_sim()
     datafiles = [
-        f'data/india_hpv_prevalence.csv',
+        # f'data/india_hpv_prevalence.csv',
         f'data/india_cancer_cases.csv',
         f'data/india_cin_types.csv',
         f'data/india_cancer_types.csv',
