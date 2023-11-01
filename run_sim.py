@@ -46,6 +46,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
         dt=[0.25, 1.0][debug],
         start=[1960, 1980][debug],
         end=2020,
+        sex_ratio=907/(907+1000),
         network='default',
         genotypes=[16, 18, 'hi5', 'ohr'],
         location='india',
@@ -79,7 +80,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
 
 
 # %% Simulation running functions
-def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, verbose=.1, do_save=False):
+def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, verbose=.1, do_shrink=True, do_save=False):
     # Make sim
     sim = make_sim(
         debug=debug,
@@ -93,7 +94,8 @@ def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, ver
     # Run
     sim['verbose'] = verbose
     sim.run()
-    # sim.shrink()
+    if do_shrink:
+        sim.shrink()
 
     # Optinally save
     if do_save:
@@ -189,7 +191,7 @@ if __name__ == '__main__':
 
     if 'run_sim' in to_run:
         # calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
-        sim = run_sim(calib_pars=None, analyzers=ut.dwelltime_by_genotype())  # Run the simulation
+        sim = run_sim(calib_pars=None, do_shrink=False)  # Run the simulation
         sim.plot()  # Plot the simulation
 
     if 'run_calib' in to_run:
