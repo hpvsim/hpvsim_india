@@ -46,9 +46,12 @@ if __name__ == '__main__':
 
     if do_run:
         sim = rs.run_sim(do_shrink=False)
+        f_conds = sim.people.is_female * sim.people.alive * sim.people.level0 * sim.people.is_active
+        m_conds = sim.people.is_male * sim.people.alive * sim.people.level0 * sim.people.is_active
         partners = {
-            'm': sim.people.n_rships[1, sim.people.is_male],
-            'f': sim.people.n_rships[1, sim.people.is_female]}
+            'f': sim.people.n_rships[1, f_conds],
+            'm': sim.people.n_rships[1, m_conds],
+        }
         sc.saveobj('results/partners.obj', partners)
     else:
         partners = sc.loadobj('results/partners.obj')

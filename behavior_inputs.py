@@ -18,8 +18,8 @@ layer_probs = dict(
     c=np.array([
         # Share of females (row 1) and males (row 2) of each age having casual relationships
         [0, 5,   10,   15,   20,   25,   30,   35,   40,   45,   50,   55,   60,   65,   70,   75],  # Age bracket
-        [0, 0, 0.10, 0.10, 0.10, 0.20, 0.30, 0.30, 0.40, 0.25, 0.20, 0.20, 0.05, 0.01, 0.01, 0.01],  # Share f
-        [0, 0, 0.05, 0.20, 0.20, 0.20, 0.50, 0.60, 0.60, 0.50, 0.40, 0.30, 0.10, 0.10, 0.10, 0.10]],  # Share m
+        [0, 0, 0.50, 0.70, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.50, 0.40, 0.10, 0.01, 0.01],  # Share f
+        [0, 0, 0.10, 0.40, 0.50, 0.60, 0.80, 0.80, 0.80, 0.80, 0.80, 0.70, 0.50, 0.30, 0.10, 0.10]],  # Share m
     ),
 )
 
@@ -31,7 +31,7 @@ m_partners = dict(
 )
 f_partners = dict(
     m=dict(dist='poisson1', par1=0.001),
-    c=dict(dist='neg_binomial', par1=10, par2=0.1),
+    c=dict(dist='neg_binomial', par1=1, par2=0.2),
 )
 
 #%% MIXING
