@@ -28,7 +28,7 @@ debug = 0  # Run with smaller population sizes and in serial
 do_shrink = True  # Do not keep people when running sims (saves memory)
 
 # Run settings
-n_trials    = [2000, 2][debug]  # How many trials to run for calibration
+n_trials    = [3000, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 1][debug]    # How many cores to use
 storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
@@ -126,22 +126,25 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
         )
     )
     genotype_pars = dict(
-        # hpv16=dict(
-        #     cancer_fn=dict(ld50=[15, 14, 16, .1]),
-            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
-        # ),
+        hpv16=dict(
+            cancer_fn=dict(ld50=[15, 14, 16, .1]),
+            cin_fn=dict(k=[.25, .2, .3, 0.01]),
+        ),
         hpv18=dict(
             rel_beta=[0.75, 0.7, 1.2, 0.05],
+            cin_fn=dict(k=[.25, .2, .3, 0.01]),
             # cancer_fn=dict(ld50=[15, 14, 16, .1]),
             # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
         ),
         hi5=dict(
             rel_beta=[0.75, 0.7, 1.2, 0.05],
+            cin_fn=dict(k=[.15, .1, .25, 0.01]),
             # cancer_fn=dict(ld50=[20, 18, 22, .1]),
             # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
         ),
         ohr=dict(
             rel_beta=[0.75, 0.7, 1.2, 0.05],
+            cin_fn=dict(k=[.15, .1, .25, 0.01]),
             # cancer_fn=dict(ld50=[20, 18, 22, .1]),
             # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
         ),
