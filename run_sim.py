@@ -124,24 +124,14 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
         )
     )
     genotype_pars = dict(
-        # hpv16=dict(
-        #     dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
-        #     cancer_fn=dict(ld50=[15, 12, 40, 1]),
-        # ),
         hpv18=dict(
-            # dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
-            # cancer_fn=dict(ld50=[15, 12, 40, 1]),
-            rel_beta=[0.75, 0.7, 1., 0.05]
+            rel_beta=[0.75, 0.7, 1.2, 0.05]
         ),
         hi5=dict(
-            # dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
-            # cancer_fn=dict(ld50=[15, 12, 40, 1]),
-            rel_beta=[0.75, 0.7, 1., 0.05]
+            rel_beta=[0.75, 0.7, 1.2, 0.05]
         ),
         ohr=dict(
-            # dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
-            # cancer_fn=dict(ld50=[15, 12, 40, 1]),
-            rel_beta=[0.75, 0.7, 1., 0.05]
+            rel_beta=[0.75, 0.7, 1.2, 0.05]
         ),
     )
 

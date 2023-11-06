@@ -12,8 +12,8 @@ layer_probs = dict(
     m=np.array([
         # Share of females (row 1) and males (row 2) of each age who are married
         [0, 5,  10,    15,   20,   25,   30,   35,   40,   45,   50,   55,   60,   65,   70,   75],  # Age bracket
-        [0, 0, 0.05, 0.25, 0.60, 0.90, 0.95, 0.70, 0.75, 0.65, 0.55, 0.40, 0.40, 0.40, 0.40, 0.40],  # Share f
-        [0, 0, 0.01, 0.05, 0.10, 0.90, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60]]  # Share m
+        [0, 0, 0.05, 0.25, 0.60, 0.90, 0.95, 0.80, 0.80, 0.65, 0.55, 0.40, 0.40, 0.40, 0.40, 0.40],  # Share f
+        [0, 0, 0.01, 0.05, 0.10, 0.90, 0.70, 0.70, 0.70, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60, 0.60]]  # Share m
     ),
     c=np.array([
         # Share of females (row 1) and males (row 2) of each age having casual relationships
