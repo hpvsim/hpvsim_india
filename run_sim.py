@@ -115,10 +115,12 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
 
     # Define the calibration parameters
     calib_pars = dict(
-        beta=[0.2, 0.1, 0.35, 0.02],
+        beta=[0.2, 0.1, 0.34, 0.02],
+        m_cross_layer=[0.9, 0.5, 0.95, 0.05],
         m_partners=dict(
             c=dict(par1=[10, 5, 12, 1])
         ),
+        f_cross_layer=[0.1, 0.05, 0.25, 0.05],
         f_partners=dict(
             c=dict(par1=[1, .5, 2, .1], par2=[.2, .1, 1, .05])
         )
