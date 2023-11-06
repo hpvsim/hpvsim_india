@@ -28,7 +28,7 @@ debug = 0  # Run with smaller population sizes and in serial
 do_shrink = True  # Do not keep people when running sims (saves memory)
 
 # Run settings
-n_trials    = [3000, 2][debug]  # How many trials to run for calibration
+n_trials    = [2000, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 1][debug]    # How many cores to use
 storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
@@ -123,27 +123,27 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
             c=dict(par1=[1, .5, 2, .1], par2=[.2, .1, 1, .05])
         )
     )
-    # genotype_pars = dict(
-    #     hpv16=dict(
-    #         dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
-    #         cancer_fn=dict(ld50=[15, 12, 40, 1]),
-    #     ),
-    #     hpv18=dict(
-    #         dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
-    #         cancer_fn=dict(ld50=[15, 12, 40, 1]),
-    #         rel_beta=[0.75, 0.7, 1., 0.05]
-    #     ),
-    #     hi5=dict(
-    #         dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
-    #         cancer_fn=dict(ld50=[15, 12, 40, 1]),
-    #         rel_beta=[0.75, 0.7, 1., 0.05]
-    #     ),
-    #     ohr=dict(
-    #         dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
-    #         cancer_fn=dict(ld50=[15, 12, 40, 1]),
-    #         rel_beta=[0.75, 0.7, 1., 0.05]
-    #     ),
-    # )
+    genotype_pars = dict(
+        # hpv16=dict(
+        #     dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
+        #     cancer_fn=dict(ld50=[15, 12, 40, 1]),
+        # ),
+        hpv18=dict(
+            # dur_cin=dict(par1=[5, 3, 8, 0.1], par2=[5, 3, 12, 0.5]),
+            # cancer_fn=dict(ld50=[15, 12, 40, 1]),
+            rel_beta=[0.75, 0.7, 1., 0.05]
+        ),
+        hi5=dict(
+            # dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
+            # cancer_fn=dict(ld50=[15, 12, 40, 1]),
+            rel_beta=[0.75, 0.7, 1., 0.05]
+        ),
+        ohr=dict(
+            # dur_cin=dict(par1=[4, 2, 6, 0.1], par2=[4, 2, 12, 0.5]),
+            # cancer_fn=dict(ld50=[15, 12, 40, 1]),
+            rel_beta=[0.75, 0.7, 1., 0.05]
+        ),
+    )
 
     calib = hpv.Calibration(sim, calib_pars=calib_pars, genotype_pars=None,
                             name=f'india_calib',
