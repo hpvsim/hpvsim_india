@@ -120,7 +120,7 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
         m_partners=dict(
             c=dict(par1=[10, 5, 12, 1])
         ),
-        f_cross_layer=[0.1, 0.05, 0.25, 0.05],
+        f_cross_layer=[0.1, 0.05, 0.5, 0.05],
         f_partners=dict(
             c=dict(par1=[1, .5, 2, .1], par2=[.2, .1, 1, .05])
         )
@@ -128,22 +128,22 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
     genotype_pars = dict(
         hpv16=dict(
             cancer_fn=dict(ld50=[15, 14, 16, .1]),
-            dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
+            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
         ),
         hpv18=dict(
             rel_beta=[0.75, 0.7, 1.2, 0.05],
             cancer_fn=dict(ld50=[15, 14, 16, .1]),
-            dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
+            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
         ),
         hi5=dict(
             rel_beta=[0.75, 0.7, 1.2, 0.05],
             cancer_fn=dict(ld50=[20, 18, 22, .1]),
-            dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
+            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
         ),
         ohr=dict(
             rel_beta=[0.75, 0.7, 1.2, 0.05],
             cancer_fn=dict(ld50=[20, 18, 22, .1]),
-            dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
+            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
         ),
     )
 
