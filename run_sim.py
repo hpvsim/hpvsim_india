@@ -29,7 +29,7 @@ do_shrink = True  # Do not keep people when running sims (saves memory)
 
 # Run settings
 n_trials    = [3000, 2][debug]  # How many trials to run for calibration
-n_workers   = [40, 4][debug]    # How many cores to use
+n_workers   = [40, 1][debug]    # How many cores to use
 storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
 # Save settings
@@ -117,10 +117,10 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
     calib_pars = dict(
         beta=[0.2, 0.1, 0.5, 0.02],
         m_partners=dict(
-            c=dict(dist='poisson1', par1=[10, 5, 12, 1])
+            c=dict(par1=[10, 5, 12, 1])
         ),
         f_partners=dict(
-            c=dict(dist='neg_binomial', par1=[1, .5, 2, .1], par2=[.2, .1, 1, .05])
+            c=dict(par1=[1, .5, 2, .1], par2=[.2, .1, 1, .05])
         )
     )
     # genotype_pars = dict(
