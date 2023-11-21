@@ -24,7 +24,7 @@ import utils as ut
 # %% Settings and filepaths
 
 # Debug switch
-debug = 0  # Run with smaller population sizes and in serial
+debug = 1  # Run with smaller population sizes and in serial
 do_shrink = True  # Do not keep people when running sims (saves memory)
 
 # Run settings
@@ -42,28 +42,20 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
     ''' Define parameters, analyzers, and interventions for the simulation -- not the sim itself '''
 
     pars = dict(
-        n_agents=[10e3, 1e3][debug],
+        n_agents=[50e3, 1e3][debug],
         dt=[0.25, 1.0][debug],
+        beta=0.28,
         start=[1960, 1980][debug],
         end=2020,
-        sex_ratio=1-907/(907+1000),
-        network='default',
         genotypes=[16, 18, 'hi5', 'ohr'],
         location='india',
         debut=dict(f=dict(dist='lognormal', par1=15., par2=2.),
                    m=dict(dist='lognormal', par1=20., par2=2.)),
-        mixing=bi.mixing,
         layer_probs=bi.layer_probs,
         m_partners=bi.m_partners,
         f_partners=bi.f_partners,
-        f_cross_layer=0.05,
-        m_cross_layer=0.95,
-        init_hpv_dist=dict(hpv16=0.4, hpv18=0.15, hi5=0.15, ohr=0.3),
-        init_hpv_prev={
-            'age_brackets': np.array([12, 17, 24, 34, 44, 64, 80, 150]),
-            'm': np.array([0.0, 0.25, 0.6, 0.25, 0.05, 0.01, 0.0005, 0]),
-            'f': np.array([0.0, 0.35, 0.7, 0.25, 0.05, 0.01, 0.0005, 0]),
-        },
+        f_cross_layer=0.025,
+        m_cross_layer=0.25,
         ms_agent_ratio=100,
         verbose=0.0,
     )
@@ -107,50 +99,36 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
 
     sim = make_sim()
     datafiles = [
-        # f'data/india_hpv_prevalence.csv',
         f'data/india_cancer_cases.csv',
         f'data/india_cin_types.csv',
         f'data/india_cancer_types.csv',
     ]
 
     # Define the calibration parameters
-    calib_pars = dict(
-        beta=[0.2, 0.1, 0.34, 0.02],
-        m_cross_layer=[0.9, 0.5, 0.95, 0.05],
-        m_partners=dict(
-            c=dict(par1=[10, 5, 12, 1])
-        ),
-        f_cross_layer=[0.1, 0.05, 0.5, 0.05],
-        f_partners=dict(
-            c=dict(par1=[1, .5, 2, .1], par2=[.2, .1, 1, .05])
-        )
-    )
     genotype_pars = dict(
         hpv16=dict(
-            cancer_fn=dict(ld50=[15, 14, 16, .1]),
-            cin_fn=dict(k=[.25, .2, .3, 0.01]),
+            cancer_fn=dict(transform_prob=[2e-3, 1e-3, 3e-3, 2e-4]),
+            cin_fn=dict(k=[.3, .2, .4, 0.01]),
+            dur_cin=dict(par1=[5, 4, 6, 0.5], par2=[20, 16, 24, 0.5]),
         ),
         hpv18=dict(
-            rel_beta=[0.75, 0.7, 1.2, 0.05],
-            cin_fn=dict(k=[.25, .2, .3, 0.01]),
-            # cancer_fn=dict(ld50=[15, 14, 16, .1]),
-            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
+            cancer_fn=dict(transform_prob=[2e-3, 1e-3, 3e-3, 2e-4]),
+            cin_fn=dict(k=[.25, .15, .35, 0.01]),
+            dur_cin=dict(par1=[5, 4, 6, 0.5], par2=[20, 16, 24, 0.5]),
         ),
         hi5=dict(
-            rel_beta=[0.75, 0.7, 1.2, 0.05],
+            cancer_fn=dict(transform_prob=[1.5e-3, 0.5e-3, 2.5e-3, 2e-4]),
             cin_fn=dict(k=[.15, .1, .25, 0.01]),
-            # cancer_fn=dict(ld50=[20, 18, 22, .1]),
-            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
+            dur_cin=dict(par1=[4.5, 3.5, 5.5, 0.5], par2=[20, 16, 24, 0.5]),
         ),
         ohr=dict(
-            rel_beta=[0.75, 0.7, 1.2, 0.05],
+            cancer_fn=dict(transform_prob=[1.5e-3, 0.5e-3, 2.5e-3, 2e-4]),
             cin_fn=dict(k=[.15, .1, .25, 0.01]),
-            # cancer_fn=dict(ld50=[20, 18, 22, .1]),
-            # dur_cin=dict(par1=[4, 2, 6, 0.5], par2=[4, 2, 20, 0.5]),
+            dur_cin=dict(par1=[4.5, 3.5, 5.5, 0.5], par2=[20, 16, 24, 0.5]),
         ),
     )
 
-    calib = hpv.Calibration(sim, calib_pars=calib_pars, genotype_pars=genotype_pars,
+    calib = hpv.Calibration(sim, calib_pars=None, genotype_pars=genotype_pars,
                             name=f'india_calib',
                             datafiles=datafiles,
                             total_trials=n_trials, n_workers=n_workers,
