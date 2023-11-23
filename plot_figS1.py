@@ -30,57 +30,57 @@ def plot_calib(calib, res_to_plot=100):
 
     # Make 2 rows, with 2 panels in the top row and 3 in the bottom
     gs0 = fig.add_gridspec(2, 1)
-    gs00 = gs0[0].subgridspec(1, 2)
-    gs01 = gs0[1].subgridspec(1, 3)
+    gs00 = gs0[0].subgridspec(1, 1)
+    gs01 = gs0[1].subgridspec(1, 2)
 
     # Pull out the analyzer and sim results
     index_to_plot = calib.df.iloc[0:res_to_plot, 0].values
     analyzer_results = [calib.analyzer_results[i] for i in index_to_plot]
     sim_results = [calib.sim_results[i] for i in index_to_plot]
 
-    ###############
-    # Panel A: HPV prevalence by age
-    ###############
-    ax = fig.add_subplot(gs00[0])
-
-    # Extract data
-    datadf = calib.target_data[0]
-    age_labels = ['15-25', '25-34', '35-44', '45-54', '55-64', '65+']
-    x = np.arange(len(age_labels))
-    best = datadf.value.values
-
-    # Pull out lower and upper bounds from Figure 54 here: https://hpvcentre.net/statistics/reports/IND.pdf
-    lowererr = np.array([0.025, 0.015, 0.02 , 0.025, 0.08 , 0.08 ])
-    uppererr = np.array([0.02 , 0.01 , 0.015, 0.03 , 0.09 , 0.08 ])
-    err = [lowererr, uppererr]
-
-    # Extract model results
-    bins = []
-    values = []
-    for run_num, run in enumerate(analyzer_results):
-        bins += x.tolist()
-        values += list(run['hpv_prevalence'][2020])
-    modeldf = pd.DataFrame({'bins': bins, 'values': values})
-
-    # Plot model
-    sns.lineplot(ax=ax, x='bins', y='values', data=modeldf, color=prev_col, errorbar=('pi', 95))
-    # Plot data
-    ax.errorbar(x, best, yerr=err, ls='none', marker='d', markersize=ms/10, color='k')
-
-    # Axis sttings
-    ax.set_ylim([0,0.25])
-    ax.set_xticks(x, age_labels)
-    ax.set_ylabel('')
-    ax.set_xlabel('')
-    ax.set_title('HPV prevalence by age, 2020')
+    # ###############
+    # # Panel A: HPV prevalence by age
+    # ###############
+    # ax = fig.add_subplot(gs00[0])
+    #
+    # # Extract data
+    # datadf = calib.target_data[0]
+    # age_labels = ['15-25', '25-34', '35-44', '45-54', '55-64', '65+']
+    # x = np.arange(len(age_labels))
+    # best = datadf.value.values
+    #
+    # # Pull out lower and upper bounds from Figure 54 here: https://hpvcentre.net/statistics/reports/IND.pdf
+    # lowererr = np.array([0.025, 0.015, 0.02 , 0.025, 0.08 , 0.08 ])
+    # uppererr = np.array([0.02 , 0.01 , 0.015, 0.03 , 0.09 , 0.08 ])
+    # err = [lowererr, uppererr]
+    #
+    # # Extract model results
+    # bins = []
+    # values = []
+    # for run_num, run in enumerate(analyzer_results):
+    #     bins += x.tolist()
+    #     values += list(run['hpv_prevalence'][2020])
+    # modeldf = pd.DataFrame({'bins': bins, 'values': values})
+    #
+    # # Plot model
+    # sns.lineplot(ax=ax, x='bins', y='values', data=modeldf, color=prev_col, errorbar=('pi', 95))
+    # # Plot data
+    # ax.errorbar(x, best, yerr=err, ls='none', marker='d', markersize=ms/10, color='k')
+    #
+    # # Axis sttings
+    # ax.set_ylim([0,0.25])
+    # ax.set_xticks(x, age_labels)
+    # ax.set_ylabel('')
+    # ax.set_xlabel('')
+    # ax.set_title('HPV prevalence by age, 2020')
 
     ###############
     # Panel B: Cancers by age
     ###############
-    ax = fig.add_subplot(gs00[1])
+    ax = fig.add_subplot(gs00[0])
 
     # Data
-    datadf = calib.target_data[1]
+    datadf = calib.target_data[0]
     # age_labels = ['0-14', '15-20', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60-64',
     #               '65-69', '70-74', '75-79', '80-84', '85+']
     # age_labels = ['', '15-20', '', '25-29', '', '35-39', '', '45-49', '', '55-59', '', '65-69', '', '75-79', '', '85+']
@@ -99,20 +99,20 @@ def plot_calib(calib, res_to_plot=100):
     sns.lineplot(ax=ax, x='bins', y='values', data=modeldf, color=canc_col, errorbar=('pi', 95))
     ax.scatter(x, best, marker='d', s=ms, color='k')
 
-    ax.set_ylim([0,30_000])
+    ax.set_ylim([0, 20_000])
     ax.set_xticks(x, age_labels)
     ax.set_ylabel('')
     ax.set_xlabel('')
     ax.set_title('Cancers by age, 2020')
 
     # CINS and cancer by genotype
-    rkeys = ['cin1_genotype_dist', 'cin3_genotype_dist', 'cancerous_genotype_dist']
-    rlabels = ['CIN1s by genotype', 'CIN3s by genotype', 'Cancers by genotype']
+    rkeys = ['cin_genotype_dist', 'cancerous_genotype_dist']
+    rlabels = ['CIN2+ by genotype', 'Cancers by genotype']
     for ai, rkey in enumerate(rkeys):
         ax = fig.add_subplot(gs01[ai])
 
         # Plot data
-        datadf = calib.target_data[ai+2]
+        datadf = calib.target_data[ai+1]
         ydata = datadf.value.values
         x = np.arange(len(ydata))
 

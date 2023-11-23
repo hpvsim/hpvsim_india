@@ -16,6 +16,7 @@ os.environ.update(
 import numpy as np
 import sciris as sc
 import hpvsim as hpv
+import pandas as pd
 
 # Imports from this repository
 import behavior_inputs as bi
@@ -27,7 +28,7 @@ import utils as ut
 debug = 0  # Run with smaller population sizes and in serial
 do_shrink = True  # Do not keep people when running sims (saves memory)
 
-# Run settings  
+# Run settings
 n_trials    = [10000, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 1][debug]    # How many cores to use
 storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
@@ -49,9 +50,10 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
         end=2020,
         genotypes=[16, 18, 'hi5', 'ohr'],
         location='india',
-        debut=dict(f=dict(dist='lognormal', par1=15., par2=2.),
-                   m=dict(dist='lognormal', par1=20., par2=2.)),
+        debut=dict(f=dict(dist='lognormal', par1=15., par2=4.),
+                   m=dict(dist='lognormal', par1=20., par2=5.)),
         layer_probs=bi.layer_probs,
+        # mixing=bi.mixing,
         m_partners=bi.m_partners,
         f_partners=bi.f_partners,
         f_cross_layer=0.025,
@@ -144,6 +146,82 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
     return sim, calib
 
 
+def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
+                     verbose=-1, calib_par_stem=None, ressubfolder=None, debug=False):
+    '''
+    Run sims with the sexual debut parameters inferred from DHS data, and save
+    the proportion of people of each age who've ever had sex
+    '''
+
+    sim = run_sim(
+        analyzers=[ut.AFS(), ut.prop_married(), hpv.snapshot(timepoints=['2020'])],
+        debug=debug,
+        verbose=verbose,
+    )
+
+    # Save output on age at first sex (AFS)
+    dfs = sc.autolist()
+    a = sim.get_analyzer('AFS')
+    for cs, cohort_start in enumerate(a.cohort_starts):
+        df = pd.DataFrame()
+        df['age'] = a.bins
+        df['cohort'] = cohort_start
+        df['model_prop_f'] = a.prop_active_f[cs, :]
+        df['model_prop_m'] = a.prop_active_m[cs, :]
+        dfs += df
+    afs_df = pd.concat(dfs)
+    sc.saveobj(f'results/model_sb_AFS.obj', afs_df)
+
+    # Save output on proportion married
+    a = sim.get_analyzer('prop_married')
+    pm_df = a.df
+    sc.saveobj(f'results/model_sb_prop_married.obj', pm_df)
+
+    # Save output on age differences between partners
+    agediff_df = pd.DataFrame()
+    snapshot = sim.get_analyzer('snapshot')
+    ppl = snapshot.snapshots[0]
+    age_diffs = ppl.contacts['m']['age_m'] - ppl.contacts['m']['age_f']
+    agediff_df['age_diffs'] = age_diffs
+    sc.saveobj(f'results/model_age_diffs.obj', agediff_df)
+
+    # Save output on the number of casual relationships
+    binspan = 5
+    bins = np.arange(15, 50, binspan)
+    snapshot = sim.get_analyzer('snapshot')
+    ppl = snapshot.snapshots[0]
+    conditions = {}
+    general_conditions = ppl.is_female * ppl.alive * ppl.level0 * ppl.is_active
+    for ab in bins:
+        conditions[ab] = (ppl.age >= ab) * (ppl.age < ab + binspan) * general_conditions
+
+    casual_partners = {(0, 1): sc.autolist(), (1, 2): sc.autolist(), (2, 3): sc.autolist(),
+                       (3, 5): sc.autolist(), (5, 50): sc.autolist()}
+    for cp in casual_partners.keys():
+        for ab, age_cond in conditions.items():
+            this_condition = conditions[ab] * (ppl.current_partners[1, :] >= cp[0]) * (
+                    ppl.current_partners[1, :] < cp[1])
+            casual_partners[cp] += len(hpv.true(this_condition))
+
+    popsize = sc.autolist()
+    for ab, age_cond in conditions.items():
+        popsize += len(hpv.true(age_cond))
+
+    # Construct dataframe
+    n_bins = len(bins)
+    partners = np.repeat([0, 1, 2, 3, 5], n_bins)
+    allbins = np.tile(bins, 5)
+    counts = np.concatenate([val for val in casual_partners.values()])
+    allpopsize = np.tile(popsize, 5)
+    shares = counts / allpopsize
+    datadict = dict(bins=allbins, partners=partners, counts=counts, popsize=allpopsize, shares=shares)
+    casual_df = pd.DataFrame.from_dict(datadict)
+
+    sc.saveobj(f'results/model_casual.obj', casual_df)
+
+    return sim, afs_df, pm_df, agediff_df, casual_df
+
+
 def plot_calib(which_pars=0, save_pars=True, filestem=''):
     filename = f'india_calib{filestem}'
     calib = sc.load(f'results/{filename}.obj')
@@ -171,7 +249,9 @@ if __name__ == '__main__':
     # List of what to run
     to_run = [
         # 'run_sim',
-        'run_calib',
+        'get_behavior',
+        # 'plot_behavior',
+        # 'run_calib',
         # 'plot_calib'
     ]
 
@@ -181,6 +261,9 @@ if __name__ == '__main__':
         # calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
         sim = run_sim(calib_pars=None, do_shrink=False)  # Run the simulation
         sim.plot()  # Plot the simulation
+
+    if 'get_behavior' in to_run:
+        sim, afs_df, pm_df, agediff_df, casual_df = get_sb_from_sims()
 
     if 'run_calib' in to_run:
         sim, calib = run_calib(n_trials=n_trials, n_workers=n_workers, filestem='', do_save=True)

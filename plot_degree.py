@@ -26,7 +26,7 @@ def plot_degree(partners):
         axes[ai].bar(bins[:-1], counts)
         axes[ai].set_xlabel(f'Number of lifetime casual partners')
         axes[ai].set_title(f'Distribution of casual partners, {sex}')
-        axes[ai].set_ylim([0, 0.75])
+        axes[ai].set_ylim([0, 1])
         stats = f"Mean: {np.mean(partners[sex]):.1f}\n"
         stats += f"Median: {np.median(partners[sex]):.1f}\n"
         stats += f"Std: {np.std(partners[sex]):.1f}\n"
