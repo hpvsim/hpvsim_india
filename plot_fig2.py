@@ -63,9 +63,15 @@ def get_dwelltime_df(sim):
 def plot_fig2(sim):
 
     ut.set_font(size=16)
-    ac_color = '#a8327b'
-    dw_color = '#027d23'
-    colors = sc.gridcolors(5)
+    ac_colors = sc.gridcolors(3) #, cmap='parula') #'#a8327b'
+    stacked_colors = [
+        '#2db5a7', #cleared
+        '#eddc42', #persisted
+        '#e67f2c', #progressed
+        '#871a6c', #cancer
+    ]
+    dw_colors = stacked_colors[1:3]#'#027d23'
+
     fig, axes = pl.subplots(2, 2, figsize=(11, 9))
     axes = axes.flatten()
 
@@ -76,7 +82,7 @@ def plot_fig2(sim):
     ax = axes[0]
     sns.boxplot(
         x="Health event", y="Age", data=ac_df, ax=ax,
-        showfliers=False, color=ac_color,
+        showfliers=False, palette=ac_colors,
     )
     ax.set_title(f'(A) Age distribution of key health events')
     ax.set_xlabel('')
@@ -86,7 +92,7 @@ def plot_fig2(sim):
     dw_df = get_dwelltime_df(sim=sim)
     ax = axes[1]
     sns.boxplot(data=dw_df, x="state", y="dwelltime",  ax=ax,
-                showfliers=False, color=dw_color)
+                showfliers=False, palette=dw_colors)
     ax.legend([], [], frameon=False)
     ax.set_xlabel("")
     ax.set_ylabel("Dwelltime")
@@ -135,7 +141,7 @@ def plot_fig2(sim):
     years = a.durations
 
     df = pd.DataFrame()
-    total_alive = res["total"] - res["dead"]
+    total_alive = res["total"]
     df["years"] = years
     df["prob_clearance"] = (res["cleared"]) / total_alive * 100
     df["prob_persist"] = (res["persisted"]) / total_alive * 100
@@ -153,18 +159,19 @@ def plot_fig2(sim):
 
     # Panel C, all outcomes
     ax = axes[2]
-    bottom = np.zeros(len(df["years"][0:10]))
+    end_ind = int(1/(a.durations[1]-a.durations[0]))*30
+    bottom = np.zeros(len(df["years"][:end_ind]))
     layers = [
         "prob_clearance",
         "prob_persist",
         "prob_progressed",
     ]
-    labels = ["Cleared", "Persistent Infection", "CIN2+"]
+    labels = ["Cleared", "Persistent infection", "CIN2+"]
     for ln, layer in enumerate(layers):
         ax.fill_between(
-            df["years"][0:10], bottom, bottom + df[layer][0:10], color=colors[ln], label=labels[ln]
+            df["years"][:end_ind], bottom, bottom + df[layer][:end_ind], color=stacked_colors[ln], label=labels[ln]
         )
-        bottom += df[layer][0:10]
+        bottom += df[layer][:end_ind]
     ax.legend(loc="lower right")
     ax.set_title('(C) Short-term outcomes')
     ax.set_xlabel("Time since infection")
@@ -179,7 +186,7 @@ def plot_fig2(sim):
             df2["years"],
             bottom,
             bottom + df2[layer],
-            color=colors[ln+2],
+            color=stacked_colors[ln+2],
             label=labels[ln],
         )
         bottom += df2[layer]
