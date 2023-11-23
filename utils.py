@@ -368,77 +368,59 @@ class outcomes_by_year(hpv.Analyzer):
 
     def apply(self, sim):
         if sim.yearvec[sim.t] == self.start_year:
-            idx = ((sim.people.date_exposed == sim.t) & (sim.people.sex == 0)).nonzero()  # Get people exposed on this step
-            inf_inds = idx[-1]
 
-            if len(inf_inds):
-                scale = sim.people.scale[inf_inds]
+            conds = (sim.people.date_exposed == sim.t) & (sim.people.sex == 0)  # Get people exposed on this step
+            scale = sim.people.scale
 
-                for idd, dd in enumerate(self.durations):
+            for idd, dd in enumerate(self.durations):
 
-                    # dead_cancer = (time_to_cancer_death <= (dd+self.interval)) & ~(time_to_other_death <= (dd + self.interval))
-                    # dead_other = ~(time_to_cancer_death <= (dd + self.interval)) & (time_to_other_death <= (dd + self.interval))
-                    # dead = (time_to_cancer_death <= (dd + self.interval)) | (time_to_other_death <= (dd + self.interval))
-                    # cleared = ~dead & (time_to_clear <= (dd+self.interval))
-                    # persisted = ~dead & ~cleared & ~(time_to_cin <= (dd+self.interval)) # Haven't yet cleared or progressed
-                    # progressed = ~dead & ~cleared & (time_to_cin <= (dd+self.interval)) & ((time_to_clear>(dd+self.interval)) | (time_to_cancer > (dd+self.interval)))  # USing the ~ means that we also count nans
-                    # cancer = ~dead & (time_to_cancer <= (dd+self.interval))
+                dur_overall = sim.people.dur_infection + sim.people.dur_cancer
 
-                    dur_to_clearance = sim.people.dur_infection[clearers]
-                    dur_to_cin = sim.people.dur_infection[cinners]
-                    dur_to_cancer = sim.people.dur_infection[cancers] + sim.people.dur_cancer[cancers]
-                    dur_to_cancer_death = (sim.people.date_dead_cancer[inf_inds] - sim.t) * sim['dt']
-                    dur_overall = sim.people.dur_infection + sim.people.dur_cancer
+                # cleared = (conds
+                #            & ((sim.people.dur_infection <= dd) | (sim.people.date_clearance == sim.t+dd))  # Infections shorted than dd
+                #            & (~np.isnan(sim.people.date_clearance))  # Have a clearance date i.e. no cancer
+                #            & (np.isnan(sim.people.date_cin) | (sim.people.dur_precin > dd)))  # either no CIN or CIN later
+                cleared = (conds
+                           & (sim.people.date_clearance <= (sim.t+dd*sim['dt']))  # Infections shorted than dd
+                           & (np.isnan(sim.people.date_cin) | (sim.people.dur_precin > dd)))  # either no CIN or CIN later
+                persisted = (conds & (sim.people.dur_infection > dd)
+                           & (sim.people.dur_precin > dd))
+                progressed = (conds & (sim.people.dur_infection > dd)
+                              & ~np.isnan(sim.people.date_cin)
+                              & (sim.people.dur_precin <= dd)
+                              & (np.isnan(sim.people.date_cancerous) | (sim.people.dur_infection > dd)))
+                cancer = (conds & ~np.isnan(sim.people.date_cancerous)
+                          & (sim.people.dur_infection <= dd)
+                          & (dur_overall > dd))
+                dead = conds & (dur_overall <= dd)
 
-                    # dead_cancer = (dur_to_cancer_death <= dd) & ~(dur_to_other_death <= dd)
-                    # dead_other = ~(dur_to_cancer_death <= dd) & (dur_to_other_death <= dd)
-                    # dead = (dur_to_cancer_death <= dd) | (dur_to_other_death <= dd)
-                    dur_overall = sim.people.dur_infection + sim.people.dur_cancer
+                # if dd == 30:
+                #     import traceback;
+                #     traceback.print_exc();
+                #     import pdb;
+                #     pdb.set_trace()
 
-                    cleared = ((sim.people.dur_infection[idx] <= dd)  # Infections shorted than dd
-                               & ~np.isnan(sim.people.date_clearance[idx])  # Have a clearance date i.e. no cancer
-                               & (np.isnan(sim.people.date_cin[idx]) | (sim.people.dur_precin[idx] > dd)))  # either no CIN or CIN later
-                    persisted = (~cleared
-                               & (np.isnan(sim.people.date_cin[idx]) | (sim.people.dur_precin[idx] > dd)))  # either no CIN or CIN later
-                    progressed = (~cleared
-                                  & ~np.isnan(sim.people.date_cin[idx])
-                                  & (sim.people.dur_precin[idx] <= dd)
-                                  & (np.isnan(sim.people.date_cancerous[idx]) | (sim.people.dur_infection[idx] > dd)))
-                    cancer = (~np.isnan(sim.people.date_cancerous[idx])
-                              & (sim.people.dur_infection[idx] <= dd)
-                              & (dur_overall[idx] > dd))
-                    dead = (dur_overall[idx] <= dd)
+                cleared_inds = hpv.true(cleared)
+                persisted_inds = hpv.true(persisted)
+                progressed_inds = hpv.true(progressed)
+                cancer_inds = hpv.true(cancer)
+                dead_inds = hpv.true(dead)
+                derived_total = len(cleared_inds) + len(persisted_inds) + len(progressed_inds) + len(cancer_inds) + len(dead_inds)
 
-                    # if dd == 30:
-                    #     import traceback;
-                    #     traceback.print_exc();
-                    #     import pdb;
-                    #     pdb.set_trace()
-
-                    # dead_cancer_inds = hpv.true(dead_cancer)
-                    # dead_other_inds = hpv.true(dead_other)
-                    # dead_inds = hpv.true(dead)
-                    cleared_inds = hpv.true(cleared)
-                    persisted_inds = hpv.true(persisted)
-                    progressed_inds = hpv.true(progressed)
-                    cancer_inds = hpv.true(cancer)
-                    dead_inds = hpv.true(dead)
-                    derived_total = len(cleared_inds) + len(persisted_inds) + len(progressed_inds) + len(cancer_inds) + len(dead_inds)
-
-                    if derived_total != len(inf_inds):
-                        import traceback;
-                        traceback.print_exc();
-                        import pdb;
-                        pdb.set_trace()
-                        errormsg = "Something is wrong!"
-                        raise ValueError(errormsg)
-                    scaled_total = scale.sum()
-                    self.results['cleared'][idd] += scale[cleared_inds].sum()
-                    self.results['persisted'][idd] += scale[persisted_inds].sum()
-                    self.results['progressed'][idd] += scale[progressed_inds].sum()
-                    self.results['cancer'][idd] += scale[cancer_inds].sum()
-                    self.results['dead'][idd] += scale[dead_inds].sum()
-                    self.results['total'][idd] += scaled_total
+                if derived_total != len(hpv.true(conds)):
+                    import traceback;
+                    traceback.print_exc();
+                    import pdb;
+                    pdb.set_trace()
+                    errormsg = "Something is wrong!"
+                    raise ValueError(errormsg)
+                scaled_total = scale[hpv.true(conds)].sum()
+                self.results['cleared'][idd] += scale[cleared_inds].sum()
+                self.results['persisted'][idd] += scale[persisted_inds].sum()
+                self.results['progressed'][idd] += scale[progressed_inds].sum()
+                self.results['cancer'][idd] += scale[cancer_inds].sum()
+                self.results['dead'][idd] += scale[dead_inds].sum()
+                self.results['total'][idd] += scaled_total
 
 
 # %% Run as a script
