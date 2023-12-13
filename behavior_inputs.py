@@ -36,6 +36,7 @@ layer_prob_options = [
 ]
 
 layer_probs = layer_prob_options[1]
+
 #%% PARTNERS
 m_partners = dict(
     m=dict(dist='poisson1', par1=0.01),

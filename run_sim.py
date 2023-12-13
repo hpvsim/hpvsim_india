@@ -64,7 +64,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
         f_partners=bi.f_partners,
         f_cross_layer=0.025,
         m_cross_layer=0.25,
-        ms_agent_ratio=1,
+        ms_agent_ratio=100,
         verbose=0.0,
     )
 
@@ -249,16 +249,30 @@ def plot_calib(which_pars=0, save_pars=True, filestem=''):
     return calib
 
 
+def run_parsets(debug=False, verbose=.1, analyzers=None, save_results=True, **kwargs):
+    ''' Run multiple simulations in parallel '''
+
+    parsets = sc.loadobj(f'results/india_pars_all.obj')
+    kwargs = sc.mergedicts(dict(debug=debug, verbose=verbose, analyzers=analyzers), kwargs)
+    simlist = sc.parallelize(run_sim, iterkwargs=dict(calib_pars=parsets), kwargs=kwargs, serial=debug, die=True)
+    msim = hpv.MultiSim(simlist)
+    msim.reduce()
+    if save_results:
+        sc.saveobj(f'results/india_msim.obj', msim.results)
+
+    return msim
+
 # %% Run as a script
 if __name__ == '__main__':
 
     # List of what to run
     to_run = [
-        'run_sim',
+        # 'run_sim',
         # 'get_behavior',
         # 'plot_behavior',
         # 'run_calib',
         # 'plot_calib'
+        'run_parsets'
     ]
 
     T = sc.timer()  # Start a timer
@@ -276,5 +290,8 @@ if __name__ == '__main__':
 
     if 'plot_calib' in to_run:
         calib = plot_calib(save_pars=True, filestem='')
+
+    if 'run_parsets' in to_run:
+        msim = run_parsets()
 
     T.toc('Done')  # Print out how long the run took
