@@ -150,7 +150,8 @@ def plot_fig2(sim):
     df2 = pd.DataFrame()
     total_persisted = res["total"] - res["cleared"]
     df2["years"] = years
-    df2["prob_persisted"] = (res["persisted"] + res["progressed"]) / total_persisted * 100
+    df2["prob_persisted"] = (res["persisted"]) / total_persisted * 100
+    df2["prob_progressed"] = (res["progressed"]) / total_persisted * 100
     df2["prob_cancer"] = (res["cancer"] + res["dead"]) / total_persisted * 100
 
     ####################
@@ -159,39 +160,42 @@ def plot_fig2(sim):
 
     # Panel C, all outcomes
     ax = axes[2]
-    end_ind = int(1/(a.durations[1]-a.durations[0]))*30
+    n_years = 10
+    end_ind = int(1/(a.durations[1]-a.durations[0]))*n_years
     bottom = np.zeros(len(df["years"][:end_ind]))
     layers = [
         "prob_clearance",
         "prob_persist",
         "prob_progressed",
     ]
-    labels = ["Cleared", "Persistent infection", "CIN2+"]
+    labels = ["Cleared", "Infection w/o HSIL", "HSIL"]
     for ln, layer in enumerate(layers):
         ax.fill_between(
             df["years"][:end_ind], bottom, bottom + df[layer][:end_ind], color=stacked_colors[ln], label=labels[ln]
         )
         bottom += df[layer][:end_ind]
     ax.legend(loc="lower right")
-    ax.set_title('(C) Short-term outcomes')
+    ax.set_title('(C) All outcomes')
     ax.set_xlabel("Time since infection")
 
     # Panel D, conditional on being alive and not cleared
     ax = axes[3]
+    n_years = 40
+    end_ind = int(1/(a.durations[1]-a.durations[0]))*n_years
     bottom = np.zeros(len(df2["years"]))
-    layers = ["prob_persisted", "prob_cancer"]
-    labels = ["CIN2+ regression/persistence", "Cancer"]
+    layers = ["prob_persisted", "prob_progressed", "prob_cancer"]
+    labels = ["Infection w/o HSIL", "HSIL", "Cancer"]
     for ln, layer in enumerate(layers):
         ax.fill_between(
-            df2["years"],
-            bottom,
-            bottom + df2[layer],
-            color=stacked_colors[ln+2],
+            df2["years"][:end_ind],
+            bottom[:end_ind],
+            bottom[:end_ind] + df2[layer][:end_ind],
+            color=stacked_colors[ln+1],
             label=labels[ln],
         )
         bottom += df2[layer]
-    ax.legend(loc="lower right")
-    ax.set_title('(D) Long-term outcomes')
+    ax.legend(loc="lower left")
+    ax.set_title('(D) Outcomes conditional on persistence')
     ax.set_xlabel("Time since infection")
 
     fig.tight_layout()
@@ -206,10 +210,10 @@ def plot_fig2(sim):
 if __name__ == '__main__':
 
     location = 'india'
-    make_sim = True
+    make_sim = False
     if make_sim:
         # calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
-        sim = rs.run_sim(calib_pars=None, analyzers=[ut.outcomes_by_year(), ut.cum_dist(), ut.age_causal(), ut.dwelltime_by_genotype()], do_save=True)  # Run the simulation
+        sim = rs.run_sim(calib_pars=None, analyzers=[ut.outcomes_by_year(), ut.age_causal(), ut.dwelltime_by_genotype()], do_save=True)  # Run the simulation
     else:
         sim = sc.loadobj(f'results/{location}.sim')
 

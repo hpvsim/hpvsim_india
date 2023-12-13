@@ -42,6 +42,14 @@ save_plots = True
 def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
     ''' Define parameters, analyzers, and interventions for the simulation -- not the sim itself '''
 
+    debut_options = [
+        dict(f=dict(dist='lognormal', par1=15., par2=4.),
+             m=dict(dist='lognormal', par1=20., par2=5.)),
+        dict(f=dict(dist='lognormal', par1=15., par2=2.),
+             m=dict(dist='lognormal', par1=20., par2=2.)),
+    ]
+    debut = debut_options[1]
+
     pars = dict(
         n_agents=[50e3, 1e3][debug],
         dt=[0.25, 1.0][debug],
@@ -50,15 +58,13 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
         end=2020,
         genotypes=[16, 18, 'hi5', 'ohr'],
         location='india',
-        debut=dict(f=dict(dist='lognormal', par1=15., par2=4.),
-                   m=dict(dist='lognormal', par1=20., par2=5.)),
+        debut=debut,
         layer_probs=bi.layer_probs,
-        # mixing=bi.mixing,
         m_partners=bi.m_partners,
         f_partners=bi.f_partners,
         f_cross_layer=0.025,
         m_cross_layer=0.25,
-        ms_agent_ratio=100,
+        ms_agent_ratio=1,
         verbose=0.0,
     )
 
@@ -237,7 +243,7 @@ def plot_calib(which_pars=0, save_pars=True, filestem=''):
         trial_pars = sc.autolist()
         for i in range(100):
             trial_pars += calib.trial_pars_to_sim_pars(which_pars=i)
-        sc.save(f'results//india_pars{filestem}.obj', calib_pars)
+        sc.save(f'results/india_pars{filestem}.obj', calib_pars)
         sc.save(f'results/india_pars{filestem}_all.obj', trial_pars)
 
     return calib
@@ -248,8 +254,8 @@ if __name__ == '__main__':
 
     # List of what to run
     to_run = [
-        # 'run_sim',
-        'get_behavior',
+        'run_sim',
+        # 'get_behavior',
         # 'plot_behavior',
         # 'run_calib',
         # 'plot_calib'
@@ -258,8 +264,8 @@ if __name__ == '__main__':
     T = sc.timer()  # Start a timer
 
     if 'run_sim' in to_run:
-        # calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
-        sim = run_sim(calib_pars=None, do_shrink=False)  # Run the simulation
+        calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
+        sim = run_sim(calib_pars=calib_pars, do_shrink=False)  # Run the simulation
         sim.plot()  # Plot the simulation
 
     if 'get_behavior' in to_run:

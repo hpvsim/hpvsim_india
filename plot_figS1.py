@@ -146,7 +146,7 @@ def plot_calib(calib, res_to_plot=100):
 if __name__ == '__main__':
 
     location = 'india'
-    calib = sc.loadobj(f'results/{location}_calib.obj')
+    calib = sc.loadobj(f'results/india_calib.obj')
     plot_calib(calib)
 
     print('Done.') 

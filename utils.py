@@ -361,21 +361,21 @@ class outcomes_by_year(hpv.Analyzer):
                     errormsg = "Something is wrong!"
                     raise ValueError(errormsg)
 
-                self.results['cleared'][idd] += len(cleared_inds)
-                self.results['persisted'][idd] += len(persisted_inds)
-                self.results['progressed'][idd] += len(progressed_inds)
-                self.results['cancer'][idd] += len(cancer_inds)
-                self.results['dead'][idd] += len(dead_inds)
-                self.results['total'][idd] += derived_total
+                # self.results['cleared'][idd] += len(cleared_inds)
+                # self.results['persisted'][idd] += len(persisted_inds)
+                # self.results['progressed'][idd] += len(progressed_inds)
+                # self.results['cancer'][idd] += len(cancer_inds)
+                # self.results['dead'][idd] += len(dead_inds)
+                # self.results['total'][idd] += derived_total
 
                 # Version with scaling
-                # scaled_total = sim.people.scale[inf_inds].sum()
-                # self.results['cleared'][idd] += scale[cleared_inds].sum()
-                # self.results['persisted'][idd] += scale[persisted_inds].sum()
-                # self.results['progressed'][idd] += scale[progressed_inds].sum()
-                # self.results['cancer'][idd] += scale[cancer_inds].sum()
-                # self.results['dead'][idd] += scale[dead_inds].sum()
-                # self.results['total'][idd] += scaled_total
+                scaled_total = sim.people.scale[inf_inds].sum()
+                self.results['cleared'][idd] += scale[cleared_inds].sum()
+                self.results['persisted'][idd] += scale[persisted_inds].sum()
+                self.results['progressed'][idd] += scale[progressed_inds].sum()
+                self.results['cancer'][idd] += scale[cancer_inds].sum()
+                self.results['dead'][idd] += scale[dead_inds].sum()
+                self.results['total'][idd] += scaled_total
 
 
 
