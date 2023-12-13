@@ -57,7 +57,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1, end=
         dt=[0.25, 1.0][debug],
         beta=0.28,
         start=[1960, 1980][debug],
-        end=2020,
+        end=end,
         genotypes=[16, 18, 'hi5', 'ohr'],
         location='india',
         debut=debut,
