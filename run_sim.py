@@ -39,7 +39,7 @@ save_plots = True
 
 
 # %% Simulation creation functions
-def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
+def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1, end=None):
     ''' Define parameters, analyzers, and interventions for the simulation -- not the sim itself '''
 
     debut_options = [
@@ -49,6 +49,8 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
              m=dict(dist='lognormal', par1=20., par2=2.)),
     ]
     debut = debut_options[1]
+
+    if end is None: end = 2020
 
     pars = dict(
         n_agents=[50e3, 1e3][debug],
@@ -79,14 +81,15 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1):
 
 
 # %% Simulation running functions
-def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, verbose=.1, do_shrink=True, do_save=False):
+def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, verbose=.1, do_shrink=True, do_save=False, end=None):
     # Make sim
     sim = make_sim(
         debug=debug,
         seed=seed,
         datafile=datafile,
         analyzers=analyzers,
-        calib_pars=calib_pars
+        calib_pars=calib_pars,
+        end=end
     )
     sim.label = f'Sim--{seed}'
 
@@ -253,7 +256,7 @@ def run_parsets(debug=False, verbose=.1, analyzers=None, save_results=True, **kw
     ''' Run multiple simulations in parallel '''
 
     parsets = sc.loadobj(f'results/india_pars_all.obj')
-    kwargs = sc.mergedicts(dict(debug=debug, verbose=verbose, analyzers=analyzers), kwargs)
+    kwargs = sc.mergedicts(dict(debug=debug, end=2040, verbose=verbose, analyzers=analyzers), kwargs)
     simlist = sc.parallelize(run_sim, iterkwargs=dict(calib_pars=parsets), kwargs=kwargs, serial=debug, die=True)
     msim = hpv.MultiSim(simlist)
     msim.reduce()

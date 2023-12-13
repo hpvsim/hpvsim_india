@@ -1,5 +1,5 @@
 """
-Plot implied natural history.
+Plot calibration to India
 """
 import hpvsim as hpv
 import hpvsim.utils as hpu
@@ -16,9 +16,7 @@ import run_sim as rs
 
 
 # %% Functions
-def annotate_axes(ax, text, fontsize=18):
-    ax.text(0.5, 0.5, text, transform=ax.transAxes,
-            ha="center", va="center", fontsize=fontsize, color="darkgrey")
+
 def plot_calib(calib, res_to_plot=100):
 
     ut.set_font(size=16)
