@@ -1,7 +1,6 @@
 """
 Plot degree distribution of casual partners
 """
-import hpvsim as hpv
 import pylab as pl
 import utils as ut
 import sciris as sc
@@ -24,7 +23,7 @@ def plot_degree(partners):
         counts = counts/total
 
         axes[ai].bar(bins[:-1], counts)
-        axes[ai].set_xlabel(f'Number of lifetime casual partners')
+        axes[ai].set_xlabel('Number of lifetime casual partners')
         axes[ai].set_title(f'Distribution of casual partners, {sex}')
         axes[ai].set_ylim([0, 1])
         stats = f"Mean: {np.mean(partners[sex]):.1f}\n"
@@ -34,7 +33,7 @@ def plot_degree(partners):
         axes[ai].text(15, 0.5, stats)
 
 
-    pl.savefig(f"figures/india_degree.png", dpi=300)
+    sc.savefig("figures/india_degree.png", dpi=300)
     pl.show()
 
     return
