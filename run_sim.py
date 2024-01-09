@@ -1,5 +1,5 @@
 '''
-Define an HPVsim simulation for Ethiopia
+Define an HPVsim simulation for India
 '''
 
 # Standard imports
