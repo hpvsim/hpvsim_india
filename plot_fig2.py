@@ -7,8 +7,9 @@ import numpy as np
 import sciris as sc
 import utils as ut
 import seaborn as sns
-
 import run_sim as rs
+
+do_show = True
 
 # %% Functions
 def get_age_causal_df(sim=None):
@@ -160,9 +161,10 @@ def plot_fig2(sim):
     ax.set_xlabel("Time since infection")
 
     fig.tight_layout()
-    fig.savefig(f"figures/fig2.png")
-    fig.show()
+    sc.savefig(f"figures/fig2.png")
 
+    if do_show:
+        pl.show()
 
     return
 
@@ -171,10 +173,14 @@ def plot_fig2(sim):
 if __name__ == '__main__':
 
     location = 'india'
-    make_sim = False
+    make_sim = True # Needed since has a different analyzer
     if make_sim:
         # calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
-        sim = rs.run_sim(calib_pars=None, analyzers=[ut.outcomes_by_year(), ut.age_causal(), ut.dwelltime_by_genotype()], do_save=True)  # Run the simulation
+        sim = rs.run_sim(
+            calib_pars=None,
+            analyzers=[ut.outcomes_by_year(), ut.age_causal(), ut.dwelltime_by_genotype()],
+            n_agents=1e6,
+            do_save=False)  # Run the simulation
     else:
         sim = sc.loadobj(f'results/{location}.sim')
 

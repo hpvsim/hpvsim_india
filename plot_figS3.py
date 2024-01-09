@@ -11,6 +11,7 @@ import seaborn as sns
 from matplotlib.ticker import FormatStrFormatter
 
 
+do_show = True
 
 # %% Functions
 def plot_india_burden():
@@ -41,7 +42,8 @@ def plot_india_burden():
     fig.tight_layout()
     fig_name = f'figures/figS3.png'
     sc.savefig(fig_name, dpi=100)
-    pl.show()
+    if do_show:
+        pl.show()
 
     return
 

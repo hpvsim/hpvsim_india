@@ -16,6 +16,8 @@ import hpvsim.utils as hpu
 import utils as ut
 import run_sim as rs
 
+do_show = True
+
 
 def plot_sb(dist_type='lognormal'):
     '''
@@ -117,7 +119,9 @@ def plot_sb(dist_type='lognormal'):
 
 
     fig.tight_layout()
-    pl.savefig(f"figures/india_behavior.png", dpi=100)
+    sc.savefig(f"figures/india_behavior.png", dpi=100)
+    if do_show:
+        pl.show()
 
     return
 
