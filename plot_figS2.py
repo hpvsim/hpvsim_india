@@ -14,6 +14,8 @@ import seaborn as sns
 
 import run_sim as rs
 
+do_show = True
+
 
 # %% Functions
 
@@ -158,7 +160,10 @@ def plot_calib(calib, res_to_plot=100):
         ax.set_title(rlabels[ai])
 
     fig.tight_layout()
-    pl.savefig(f"figures/figS2.png", dpi=300)
+    sc.savefig(f"figures/figS2.png", dpi=300)
+
+    if do_show:
+        pl.show()
 
     return
 
