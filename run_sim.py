@@ -29,7 +29,7 @@ save_plots = True
 
 
 # %% Simulation creation functions
-def make_sim(calib_pars=None, analyzers=[], debug=debug, datafile=None, seed=1, end=None):
+def make_sim(calib_pars=None, analyzers=[], debug=debug, n_agents=50e3, datafile=None, seed=1, end=None):
     ''' Define parameters, analyzers, and interventions for the simulation -- not the sim itself '''
 
     debut_options = [
@@ -43,7 +43,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=debug, datafile=None, seed=1, 
     if end is None: end = 2020
 
     pars = dict(
-        n_agents=[50e3, 1e3][debug],
+        n_agents=[n_agents, 1e3][debug],
         dt=[0.25, 1.0][debug],
         beta=0.28,
         start=[1960, 1980][debug],
@@ -71,7 +71,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=debug, datafile=None, seed=1, 
 
 
 # %% Simulation running functions
-def run_sim(calib_pars=None, analyzers=None, debug=debug, datafile=None, seed=1, verbose=.1, do_shrink=do_shrink, do_save=do_save, end=None):
+def run_sim(calib_pars=None, analyzers=None, debug=debug, datafile=None, n_agents=50e3, seed=1, verbose=.1, do_shrink=do_shrink, do_save=do_save, end=None):
     # Make sim
     sim = make_sim(
         debug=debug,
@@ -79,6 +79,7 @@ def run_sim(calib_pars=None, analyzers=None, debug=debug, datafile=None, seed=1,
         datafile=datafile,
         analyzers=analyzers,
         calib_pars=calib_pars,
+        n_agents=n_agents,
         end=end
     )
     sim.label = f'Sim-{seed}'

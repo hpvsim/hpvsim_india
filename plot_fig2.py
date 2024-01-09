@@ -171,10 +171,14 @@ def plot_fig2(sim):
 if __name__ == '__main__':
 
     location = 'india'
-    make_sim = False
+    make_sim = True
     if make_sim:
         # calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
-        sim = rs.run_sim(calib_pars=None, analyzers=[ut.outcomes_by_year(), ut.age_causal(), ut.dwelltime_by_genotype()], do_save=True)  # Run the simulation
+        sim = rs.run_sim(
+            calib_pars=None,
+            analyzers=[ut.outcomes_by_year(), ut.age_causal(), ut.dwelltime_by_genotype()],
+            n_agents=1e6,
+            do_save=False)  # Run the simulation
     else:
         sim = sc.loadobj(f'results/{location}.sim')
 
