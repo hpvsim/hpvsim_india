@@ -63,7 +63,7 @@ def get_dwelltime_df(sim):
 def plot_fig2(sim):
 
     ut.set_font(size=16)
-    ac_colors = sc.gridcolors(3) #, cmap='parula') #'#a8327b'
+    ac_colors = sc.gridcolors(3)
     stacked_colors = [
         '#2db5a7', #cleared
         '#eddc42', #persisted
