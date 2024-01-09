@@ -273,7 +273,7 @@ if __name__ == '__main__':
 
     if 'run_sim' in to_run:
         calib_pars = sc.loadobj('results/india_pars.obj')  # Load parameters from a previous calibration
-        sim = run_sim(calib_pars=calib_pars, do_shrink=False)  # Run the simulation
+        sim = run_sim(calib_pars=calib_pars, do_save=False, do_shrink=True)  # Run the simulation
         sim.plot()  # Plot the simulation
 
     if 'get_behavior' in to_run:
