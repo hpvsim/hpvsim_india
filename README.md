@@ -5,7 +5,7 @@ This repository includes the code for creating and calibrating a model of HPV tr
 
 ## Installation
 
-If HPVsim is already installed (`pip install hpvsim`), the only other required dependency is `seaborn`.
+If HPVsim v2.0.0 is already installed (`pip install hpvsim==2.0.0`), the only other required dependency is `seaborn`. Please ensure that you are using Python 3.9 or 3.10 (3.11 is **not** supported).
 
 
 ## Organization

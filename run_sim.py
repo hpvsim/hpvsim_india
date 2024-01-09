@@ -29,7 +29,7 @@ save_plots = True
 
 
 # %% Simulation creation functions
-def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1, end=None):
+def make_sim(calib_pars=None, analyzers=[], debug=debug, datafile=None, seed=1, end=None):
     ''' Define parameters, analyzers, and interventions for the simulation -- not the sim itself '''
 
     debut_options = [
@@ -71,7 +71,7 @@ def make_sim(calib_pars=None, analyzers=[], debug=0, datafile=None, seed=1, end=
 
 
 # %% Simulation running functions
-def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, verbose=.1, do_shrink=True, do_save=False, end=None):
+def run_sim(calib_pars=None, analyzers=None, debug=debug, datafile=None, seed=1, verbose=.1, do_shrink=do_shrink, do_save=do_save, end=None):
     # Make sim
     sim = make_sim(
         debug=debug,
@@ -81,7 +81,7 @@ def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, ver
         calib_pars=calib_pars,
         end=end
     )
-    sim.label = f'Sim--{seed}'
+    sim.label = f'Sim-{seed}'
 
     # Run
     sim['verbose'] = verbose
@@ -89,7 +89,7 @@ def run_sim(calib_pars=None, analyzers=None, debug=0, datafile=None, seed=1, ver
     if do_shrink:
         sim.shrink()
 
-    # Optinally save
+    # Optionally save
     if do_save:
         sim.save(f'results/india.sim')
 
@@ -260,12 +260,12 @@ if __name__ == '__main__':
 
     # List of what to run
     to_run = [
-        'run_sim',
-        # 'get_behavior',
-        # 'plot_behavior',
+        # 'run_sim',
+        'get_behavior',
+        'plot_behavior',
         # 'run_calib',
-        # 'plot_calib'
-        # 'run_parsets'
+        'plot_calib'
+        'run_parsets'
     ]
 
     T = sc.timer()  # Start a timer
