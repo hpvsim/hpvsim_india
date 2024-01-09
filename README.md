@@ -1,14 +1,14 @@
 # HPVsim model for India
 
-This repository includes the code for creating and calibrating a model oof HPV transmission and progression in India. The repository is organized to support reproducing the figures and analyses of the HPVsim methods manuscript.
+This repository includes the code for creating and calibrating a model of HPV transmission and progression in India. The repository is organized to support reproducing the figures and analyses of the HPVsim methods manuscript.
 
 ## Organization
 
 The repository is organized as follows:
 
 ### Inputs
-- `data` includes all the input datafiles used for making and validating the model
-- `behavior_inputs.py` contains additional behavioral input parameters
+- `data` includes all the input datafiles used for making and validating the model.
+- `behavior_inputs.py` contains additional behavioral input parameters.
 
 ### Running scripts
 - `run_sim.py` contains separate methods for running the sim, extracting sexual behavior, running and plotting a calibration, and running multiple parsets. In order to use the plotting scripts described below, these functions must be run first.
@@ -31,8 +31,9 @@ There are separate scripts for plotting each figure in the HPVsim methods manusc
 
 ### Additional utility scripts
 - `utils.py` contains utilities for numerical calculations, processing data, and creating plots.
+- `plot_degree.py` plots the network degree distribution for casual partnerships.
 
 
 ## Installation
 
-If HPVsim is already installed (`pip install hpvsim`), the only other required dependency is ``seaborn``.
+If HPVsim is already installed (`pip install hpvsim`), the only other required dependency is `seaborn`.
