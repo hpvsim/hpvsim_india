@@ -2,6 +2,12 @@
 
 This repository includes the code for creating and calibrating a model of HPV transmission and progression in India. The repository is organized to support reproducing the figures and analyses of the HPVsim methods manuscript.
 
+
+## Installation
+
+If HPVsim is already installed (`pip install hpvsim`), the only other required dependency is `seaborn`.
+
+
 ## Organization
 
 The repository is organized as follows:
@@ -32,8 +38,3 @@ There are separate scripts for plotting each figure in the HPVsim methods manusc
 ### Additional utility scripts
 - `utils.py` contains utilities for numerical calculations, processing data, and creating plots.
 - `plot_degree.py` plots the network degree distribution for casual partnerships.
-
-
-## Installation
-
-If HPVsim is already installed (`pip install hpvsim`), the only other required dependency is `seaborn`.
