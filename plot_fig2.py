@@ -1,19 +1,14 @@
 """
 Plot implied natural history.
 """
-import hpvsim as hpv
-import hpvsim.utils as hpu
-import hpvsim.parameters as hppar
 import pylab as pl
 import pandas as pd
-from scipy.stats import lognorm, norm
 import numpy as np
 import sciris as sc
 import utils as ut
 import seaborn as sns
 
 import run_sim as rs
-import math
 
 # %% Functions
 def get_age_causal_df(sim=None):
@@ -65,12 +60,12 @@ def plot_fig2(sim):
     ut.set_font(size=16)
     ac_colors = sc.gridcolors(3)
     stacked_colors = [
-        '#2db5a7', #cleared
-        '#eddc42', #persisted
-        '#e67f2c', #progressed
-        '#871a6c', #cancer
+        '#2db5a7',  # cleared
+        '#eddc42',  # persisted
+        '#e67f2c',  # progressed
+        '#871a6c',  # cancer
     ]
-    dw_colors = stacked_colors[1:3]#'#027d23'
+    dw_colors = stacked_colors[1:3]
 
     fig, axes = pl.subplots(2, 2, figsize=(11, 9))
     axes = axes.flatten()
@@ -102,40 +97,6 @@ def plot_fig2(sim):
     ######################################################
     # Bottom row: stacked plots
     ######################################################
-
-    # # Jamie's version
-    # cum_dist = sim.get_analyzer('cum_dist')
-    # durs_to_cancer, counts_to_cancer = np.unique([math.ceil(elem) for elem in cum_dist.dur_to_cancer], return_counts=True)
-    # durs_to_cin, counts_to_cin = np.unique([math.ceil(elem) for elem in cum_dist.dur_to_cin], return_counts=True)
-    # durs_to_clearance, counts_to_clearance = np.unique([math.ceil(elem) for elem in cum_dist.dur_to_clearance], return_counts=True)
-    #
-    # df = pd.DataFrame()
-    # df['years'] = np.arange(0, 30)
-    # durs = np.zeros(30)
-    # durs_subset = durs_to_clearance[durs_to_clearance < 30]
-    # durs[[int(elem) for elem in durs_subset]] = counts_to_clearance[:len(durs_subset)]
-    # df['n_cleared'] = durs
-    # df['prob_clearance'] = 100 * np.cumsum(df['n_cleared']) / cum_dist.total_infections
-    #
-    # durs_subset = durs_to_cin[durs_to_cin < 30]
-    # durs[[int(elem) for elem in durs_subset]] = counts_to_cin[:len(durs_subset)]
-    # df['n_cin'] = durs
-    # df['prob_cin'] = 100 * np.cumsum(df['n_cin']) / cum_dist.total_infections
-    #
-    # durs_subset = durs_to_cancer[durs_to_cancer < 30]
-    # durs[[int(elem) for elem in durs_subset]] = counts_to_cancer[:len(durs_subset)]
-    # df['n_cancer'] = durs
-    # df['prob_cancer'] = 100 * np.cumsum(df['n_cancer']) / cum_dist.total_infections
-    #
-    # ax = axes[2]
-    # ax.fill_between(df['years'], np.zeros(len(df['years'])), df['prob_clearance'], color=colors[0], label='Cleared')
-    # ax.fill_between(df['years'], df['prob_clearance'], 100 - df['prob_cin'], color=colors[1], label='Persisted')
-    # ax.fill_between(df['years'], 100 - df['prob_cin'], 100 - df['prob_cancer'], color=colors[2], label='CIN2+')
-    # ax.fill_between(df['years'], 100 - df['prob_cancer'], 100 * np.ones(len(df['years'])), color=colors[3], label='Cancer')
-    # ax.legend(loc='lower right')
-    # ax.set_xlabel('Time since infection')
-
-
     a = sim.get_analyzer('outcomes_by_year')
     res = a.results
     years = a.durations
