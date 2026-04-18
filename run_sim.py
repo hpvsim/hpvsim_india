@@ -21,7 +21,6 @@ do_shrink = True  # Do not keep people when running sims (saves memory)
 # Run settings
 n_trials    = [10000, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 1][debug]    # How many cores to use
-storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
 # Save settings
 do_save = True
@@ -133,9 +132,7 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
     calib = hpv.Calibration(sim, calib_pars=None, genotype_pars=genotype_pars,
                             name=f'india_calib',
                             datafiles=datafiles,
-                            total_trials=n_trials, n_workers=n_workers,
-                            # storage=storage
-                            )
+                            total_trials=n_trials, n_workers=n_workers)
     calib.calibrate()
     filename = f'india_calib{filestem}'
     if do_save:
@@ -157,6 +154,7 @@ def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
         analyzers=[ut.AFS(), ut.prop_married(), hpv.snapshot(timepoints=['2020'])],
         debug=debug,
         verbose=verbose,
+        do_save=False,
     )
 
     # Save output on age at first sex (AFS)
