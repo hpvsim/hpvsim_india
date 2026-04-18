@@ -170,12 +170,12 @@ def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
         df['model_prop_m'] = a.prop_active_m[cs, :]
         dfs += df
     afs_df = pd.concat(dfs)
-    sc.saveobj(f'results/model_sb_AFS.obj', afs_df)
+    afs_df.to_csv(f'results/model_sb_AFS.csv', index=False)
 
     # Save output on proportion married
     a = sim.get_analyzer('prop_married')
     pm_df = a.df
-    sc.saveobj(f'results/model_sb_prop_married.obj', pm_df)
+    pm_df.to_csv(f'results/model_sb_prop_married.csv', index=False)
 
     # Save output on age differences between partners
     agediff_df = pd.DataFrame()
@@ -183,7 +183,7 @@ def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
     ppl = snapshot.snapshots[0]
     age_diffs = ppl.contacts['m']['age_m'] - ppl.contacts['m']['age_f']
     agediff_df['age_diffs'] = age_diffs
-    sc.saveobj(f'results/model_age_diffs.obj', agediff_df)
+    agediff_df.to_csv(f'results/model_age_diffs.csv', index=False)
 
     # Save output on the number of casual relationships
     binspan = 5
@@ -217,7 +217,7 @@ def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
     datadict = dict(bins=allbins, partners=partners, counts=counts, popsize=allpopsize, shares=shares)
     casual_df = pd.DataFrame.from_dict(datadict)
 
-    sc.saveobj(f'results/model_casual.obj', casual_df)
+    casual_df.to_csv(f'results/model_casual.csv', index=False)
 
     return sim, afs_df, pm_df, agediff_df, casual_df
 

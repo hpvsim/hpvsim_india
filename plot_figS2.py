@@ -1,177 +1,150 @@
 """
-Plot calibration to India
+Plot calibration to India.
+
+Two modes:
+  python plot_figS2.py --run-sim   # run calibration + extract CSVs (VM, slow)
+  python plot_figS2.py             # plot from saved CSVs (local)
 """
-import hpvsim as hpv
-import hpvsim.utils as hpu
-import hpvsim.parameters as hppar
-import pylab as pl
-import pandas as pd
-from scipy.stats import lognorm, norm
+import argparse
+
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import sciris as sc
-import utils as ut
 import seaborn as sns
 
 import run_sim as rs
+import utils as ut
 
 do_show = True
 
 
-# %% Functions
+# %% Data extraction (run on VM after calibration)
+def save_figS2_data(calib, res_to_plot=100, resfolder='results'):
+    indices = calib.df.iloc[0:res_to_plot, 0].values.astype(int)
 
-def plot_calib(calib, res_to_plot=100):
+    rows = []
+    for i in indices:
+        cancers = calib.analyzer_results[i]['cancers'][2020]
+        for bin_idx, val in enumerate(cancers):
+            rows.append({'trial_idx': int(i), 'bin': bin_idx, 'value': float(val)})
+    pd.DataFrame(rows).to_csv(f'{resfolder}/figS2_cancers_by_age.csv', index=False)
 
+    for rkey in ['cin_genotype_dist', 'cancerous_genotype_dist']:
+        rows = []
+        for i in indices:
+            run = calib.sim_results[i][rkey]
+            arr = [run] if sc.isnumber(run) else list(run)
+            for bin_idx, val in enumerate(arr):
+                rows.append({'trial_idx': int(i), 'bin': bin_idx, 'value': float(val)})
+        pd.DataFrame(rows).to_csv(f'{resfolder}/figS2_{rkey}.csv', index=False)
+
+    calib.target_data[0].to_csv(f'{resfolder}/figS2_target_cancers.csv', index=False)
+    calib.target_data[1].to_csv(f'{resfolder}/figS2_target_cin_genotype.csv', index=False)
+    calib.target_data[2].to_csv(f'{resfolder}/figS2_target_cancerous_genotype.csv', index=False)
+
+
+# %% Plotting (run locally)
+def plot_calib(resfolder='results', outpath='figures/figS2.png'):
     ut.set_font(size=15)
-    fig = pl.figure(layout="tight", figsize=(10, 7))
+    fig = plt.figure(layout='tight', figsize=(10, 7))
     prev_col = '#5f5cd2'
     canc_col = '#c1981d'
     ms = 80
     gen_cols = sc.gridcolors(4)
 
-    # Make 2 rows, with 2 panels in the top row and 3 in the bottom
     gs0 = fig.add_gridspec(2, 1)
     gs00 = gs0[0].subgridspec(1, 1)
     gs01 = gs0[1].subgridspec(1, 4)
 
-    # Pull out the analyzer and sim results
-    index_to_plot = calib.df.iloc[0:res_to_plot, 0].values
-    analyzer_results = [calib.analyzer_results[i] for i in index_to_plot]
-    sim_results = [calib.sim_results[i] for i in index_to_plot]
-
     # ###############
     # # Panel A: HPV prevalence by age
     # ###############
-    res = sc.loadobj(f'results/india_msim.obj')
+    res = sc.loadobj(f'{resfolder}/india_msim.obj')
     year = 2020
     ind = sc.findinds(res['year'], year)[0]
 
-    # age_bins = np.array( [  0,   5,  10,  15,  20,  25,  30,  35,  40,  45,  50,  55,  60,  65,  70,  75,    80,    85, 100])
-    # new_age_bins = ['15-25', '25-34', '35-44', '45-54', '55-64', '65+']
-    pre_cins = dict()
-    ts = 0.5  # detection rate / sensitivity
+    pre_cins = {}
+    ts = 0.5
     for which in ['values', 'low', 'high']:
         this_res = res['n_precin_by_age'][which][:, ind]
         pre_cins[which] = [
             sum(this_res[3:5]) / sum(res['n_females_alive_by_age'][3:5, ind]),
-            sum(this_res[5:7])*ts / sum(res['n_females_alive_by_age'][5:7, ind]),
-            sum(this_res[7:9])*ts / sum(res['n_females_alive_by_age'][7:9, ind]),
-            sum(this_res[9:11])*ts / sum(res['n_females_alive_by_age'][9:11, ind]),
-            sum(this_res[11:13])*ts / sum(res['n_females_alive_by_age'][11:13, ind]),
+            sum(this_res[5:7]) * ts / sum(res['n_females_alive_by_age'][5:7, ind]),
+            sum(this_res[7:9]) * ts / sum(res['n_females_alive_by_age'][7:9, ind]),
+            sum(this_res[9:11]) * ts / sum(res['n_females_alive_by_age'][9:11, ind]),
+            sum(this_res[11:13]) * ts / sum(res['n_females_alive_by_age'][11:13, ind]),
         ]
 
     ax = fig.add_subplot(gs01[:2])
-
-    # Extract data
-    # datadf = calib.target_data[0]
-    # best = datadf.value.values
-    age_labels = ['15-25', '25-34', '35-44', '45-54', '55-64'] # '65+']
+    age_labels = ['15-25', '25-34', '35-44', '45-54', '55-64']
     x = np.arange(len(age_labels))
-    best = np.array([.15, .13, .13, .13, .13]) #, .12])
-
-    # Pull out lower and upper bounds from Figure 54 here: https://hpvcentre.net/statistics/reports/IND.pdf
-    lowererr = np.array([0.025, 0.015, 0.02 , 0.025, 0.08 ]) #, 0.08 ])
-    uppererr = np.array([0.02 , 0.01 , 0.015, 0.03 , 0.09 ]) #, 0.08 ])
+    best = np.array([.15, .13, .13, .13, .13])
+    lowererr = np.array([0.025, 0.015, 0.02, 0.025, 0.08])
+    uppererr = np.array([0.02, 0.01, 0.015, 0.03, 0.09])
     err = [lowererr, uppererr]
 
-    # # Extract model results
-    # bins = []
-    # values = []
-    # for run_num, run in enumerate(analyzer_results):
-    #     bins += x.tolist()
-    #     values += list(run['hpv_prevalence'][2020])
-    # modeldf = pd.DataFrame({'bins': bins, 'values': values})
-
-    # # Plot model
-    # sns.lineplot(ax=ax, x='bins', y='values', data=modeldf, color=prev_col, errorbar=('pi', 95))
-
-    # Plot model from msim:
     ax.plot(x, pre_cins['values'], color=prev_col)
     ax.fill_between(x, pre_cins['low'], pre_cins['high'], color=prev_col, alpha=0.3)
-
-    # Plot data
-    ax.errorbar(x, best, yerr=err, ls='none', marker='d', markersize=ms/10, color='k')
-
-    # Axis sttings
+    ax.errorbar(x, best, yerr=err, ls='none', marker='d', markersize=ms / 10, color='k')
     ax.set_ylim([0, 0.25])
     ax.set_xticks(x, age_labels)
-    ax.set_ylabel('')
     ax.set_xlabel('Age')
     ax.set_title('Detectable HPV prevalence,\n normal cervical cytology, 2020')
 
     ###############
-    # Panel B: Cancers by age
+    # Panel B: Cancers by age (from calib extract)
     ###############
-    # ax = fig.add_subplot(gs01[0])
     ax = fig.add_subplot(gs00[0])
-
-    # Data
-    datadf = calib.target_data[0]
+    cancers_df = pd.read_csv(f'{resfolder}/figS2_cancers_by_age.csv')
+    target_cancers = pd.read_csv(f'{resfolder}/figS2_target_cancers.csv')
     age_labels = ['0', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60', '65', '70', '75', '80', '85']
     x = np.arange(len(age_labels))
-    best = datadf.value.values
 
-    # Extract model results
-    bins = []
-    values = []
-    for run_num, run in enumerate(analyzer_results):
-        bins += x.tolist()
-        values += list(run['cancers'][2020])
-    modeldf = pd.DataFrame({'bins': bins, 'values': values})
-
-    sns.lineplot(ax=ax, x='bins', y='values', data=modeldf, color=canc_col, errorbar=('pi', 95))
-    ax.scatter(x, best, marker='d', s=ms, color='k')
-
+    sns.lineplot(ax=ax, x='bin', y='value', data=cancers_df, color=canc_col, errorbar=('pi', 95))
+    ax.scatter(x, target_cancers['value'].values, marker='d', s=ms, color='k')
     ax.set_ylim([0, 20_000])
     ax.set_xticks(x, age_labels)
-    ax.set_ylabel('')
     ax.set_xlabel('Age')
     ax.set_title('Cancers by age, 2020')
 
-    # CINS and cancer by genotype
-    rkeys = ['cin_genotype_dist', 'cancerous_genotype_dist']
-    rlabels = ['CIN2+ by genotype', 'Cancers by genotype']
-    for ai, rkey in enumerate(rkeys):
-        ax = fig.add_subplot(gs01[ai+2])
+    ###############
+    # Panels D, E: CIN + cancer by genotype
+    ###############
+    for ai, rkey in enumerate(['cin_genotype_dist', 'cancerous_genotype_dist']):
+        ax = fig.add_subplot(gs01[ai + 2])
+        model_df = pd.read_csv(f'{resfolder}/figS2_{rkey}.csv')
+        target_name = {'cin_genotype_dist': 'cin_genotype', 'cancerous_genotype_dist': 'cancerous_genotype'}[rkey]
+        target_df = pd.read_csv(f'{resfolder}/figS2_target_{target_name}.csv')
 
-        # Plot data
-        datadf = calib.target_data[ai+1]
-        ydata = datadf.value.values
-        x = np.arange(len(ydata))
-
-        # Extract model results
-        bins = []
-        values = []
-        for run_num, run in enumerate(sim_results):
-            bins += x.tolist()
-            if sc.isnumber(run[rkey]):
-                values += sc.promotetolist(run[rkey])
-            else:
-                values += run[rkey].tolist()
-        modeldf = pd.DataFrame({'bins': bins, 'values': values})
-
-        # Plot model
-        sns.boxplot(ax=ax, x='bins', y='values', data=modeldf, palette=gen_cols, showfliers=False)
-        ax.scatter(x, ydata, color='k', marker='d', s=ms)
-
+        sns.boxplot(ax=ax, x='bin', y='value', data=model_df, palette=gen_cols, showfliers=False)
+        ax.scatter(np.arange(len(target_df)), target_df['value'].values, color='k', marker='d', s=ms)
         ax.set_ylim([0, 1])
         ax.set_xticks(np.arange(4), ['16', '18', 'Hi5', 'OHR'])
-        ax.set_ylabel('')
-        ax.set_xlabel('')
-        ax.set_title(rlabels[ai])
+        ax.set_title({'cin_genotype_dist': 'CIN2+ by genotype',
+                      'cancerous_genotype_dist': 'Cancers by genotype'}[rkey])
 
     fig.tight_layout()
-    sc.savefig(f"figures/figS2.png", dpi=300)
-
+    sc.savefig(outpath, dpi=300)
     if do_show:
-        pl.show()
+        plt.show()
 
-    return
 
 # %% Run as a script
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run-sim', action='store_true',
+                        help='Run calibration and save CSVs (heavy, VM-side)')
+    parser.add_argument('--resfolder', default='results')
+    parser.add_argument('--figpath', default='figures/figS2.png')
+    parser.add_argument('--res-to-plot', type=int, default=100)
+    args = parser.parse_args()
 
-    location = 'india'
-    calib = sc.loadobj(f'results/india_calib.obj')
-    plot_calib(calib)
-
-    print('Done.') 
+    if args.run_sim:
+        sim, calib = rs.run_calib(n_trials=rs.n_trials, n_workers=rs.n_workers,
+                                  do_save=True, filestem='')
+        save_figS2_data(calib, res_to_plot=args.res_to_plot, resfolder=args.resfolder)
+        print(f'Saved figS2 CSVs to {args.resfolder}')
+    else:
+        plot_calib(resfolder=args.resfolder, outpath=args.figpath)
+        print('Done.')
