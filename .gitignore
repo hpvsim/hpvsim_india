@@ -1,0 +1,14 @@
+# Migration: large sim outputs in versioned subdirs are regenerable, not committed
+# (plot-ready artifacts like .csv, .json, .npz should still be committed)
+raw_results/
+results/v*/*.obj
+results/v*/*.pkl
+results/v*/*.sim
+results/v*/*.msim
+
+# Raw fig2 per-event extractions — too large; commit summary CSVs instead
+results/fig2_age_causal.csv
+results/fig2_dwelltime.csv
+
+# Plots are regenerated locally from CSVs
+figures/
