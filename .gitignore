@@ -10,5 +10,8 @@ results/v*/*.msim
 results/fig2_age_causal.csv
 results/fig2_dwelltime.csv
 
+# Full calibration object — commit CSV extracts (figS2_*) instead
+results/india_calib.obj
+
 # Plots are regenerated locally from CSVs
 figures/
