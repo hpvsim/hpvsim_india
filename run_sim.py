@@ -134,7 +134,7 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
                             name=f'india_calib',
                             datafiles=datafiles,
                             total_trials=n_trials, n_workers=n_workers,
-                            storage=storage
+                            # storage=storage
                             )
     calib.calibrate()
     filename = f'india_calib{filestem}'
