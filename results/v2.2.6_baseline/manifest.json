@@ -1,8 +1,20 @@
 {
-  "figure": "figS3",
-  "source_objects": [
-    "results/india_msim.obj"
-  ],
+  "figures": ["fig2", "figS1", "figS3"],
+  "fig2": {
+    "sources": ["fig2_age_causal_summary.csv", "fig2_dwelltime_summary.csv", "fig2_outcomes.csv"],
+    "note": "Boxplot summary stats (Q1/median/Q3/whiskers) not raw events"
+  },
+  "figS1": {
+    "sources": ["model_sb_AFS.csv", "model_sb_prop_married.csv", "model_age_diffs.csv", "model_casual.csv"],
+    "note": "partners.obj still loaded from results/ for panels D-E"
+  },
+  "figS3": {
+    "sources": ["figS3_hpvsim.csv", "figS3_globocan.csv"]
+  },
+  "figS2": {
+    "status": "pending VM calibration run"
+  },
   "hpvsim_version": "2.2.6",
+  "hpvsim_commit": "5cfba773272e48cb736284031471a88215c14879",
   "date": "2026-04-18"
 }
