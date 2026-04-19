@@ -45,7 +45,27 @@ Each baseline lives under `results/<version>/` and contains CSVs (never pickles)
 python compare_fig2.py --baselines v2.2.6_baseline v2.3.0_baseline
 ```
 
-When new hpvsim versions land, re-run the `--run-sim` steps against the new version and copy the resulting CSVs into a new baseline dir.
+### Adding a future-version baseline (v2.3, v3.0, ...)
+
+When a new HPVsim version ships:
+
+```bash
+# 1. On VM, in a clean env pinned to the new version
+conda create -n hpvsim230 python=3.11 -y && conda activate hpvsim230
+pip install hpvsim==2.3.0 seaborn optuna
+# 2. Re-run each script that has a --run-sim mode
+python plot_fig2.py --run-sim       # heavy: 1M-agent sim
+python plot_figS1.py --run-sim      # sexual-behavior extraction
+python plot_figS2.py --run-sim      # full calibration (slowest)
+# (plot_figS3 loads the committed india_msim.obj; regenerate via run_sim.py's run_parsets flow)
+# 3. Freeze the fresh CSVs into a versioned baseline dir
+mkdir -p results/v2.3.0_baseline
+cp results/*.csv results/v2.3.0_baseline/
+# 4. Commit + push + compare
+python compare_fig2.py --baselines v2.2.6_baseline v2.3.0_baseline
+```
+
+The comparison script extends trivially to v3.0 by appending the new baseline name to `--baselines`.
 
 ## Inputs
 
