@@ -1,40 +1,57 @@
 # HPVsim model for India
 
-This repository includes the code for creating and calibrating a model of HPV transmission and progression in India. The repository is organized to support reproducing the figures and analyses of the HPVsim methods manuscript.
+Code for creating and calibrating a model of HPV transmission and progression in India, and for reproducing the India-specific figures of the HPVsim methods manuscript.
 
+**Results in this repository were produced with HPVsim v2.2.6.** Baselines for comparison across hpvsim versions live in [`results/v2.2.6_baseline/`](results/v2.2.6_baseline/) (current) and [`results/v1.0.0_published/`](results/v1.0.0_published/) (extracted from the original paper artifacts, where available).
 
 ## Installation
 
-If HPVsim v2.0.0 is already installed (`pip install hpvsim==2.0.0`), the only other required dependency is `seaborn`. Please ensure that you are using Python 3.9 or 3.10 (3.11 is **not** supported).
+```bash
+pip install hpvsim==2.2.6 seaborn
+```
 
+Python 3.9+.
 
-## Organization
+## Workflow: heavy sims on VM, plots locally
 
-The repository is organized as follows:
+Every plot script has two modes: `--run-sim` runs the heavy calculation and saves lightweight CSVs under `results/`; running without flags loads the CSVs and produces the figure. The intended flow is:
 
-### Inputs
-- `data` includes all the input datafiles used for making and validating the model.
-- `behavior_inputs.py` contains additional behavioral input parameters.
+1. **VM:** run `python plot_XXX.py --run-sim`, commit and push the resulting `results/*.csv` files
+2. **Local:** pull, run `python plot_XXX.py` to render the figure from the CSVs
 
-### Running scripts
-- `run_sim.py` contains separate methods for running the sim, extracting sexual behavior, running and plotting a calibration, and running multiple parsets. In order to use the plotting scripts described below, these functions must be run first.
+Per-event extractions (e.g. age at cancer onset for a million agents) are not committed — only boxplot summary statistics are. See `.gitignore` for the exclusion list.
 
 ### Plotting scripts
 
-There are separate scripts for plotting each figure in the HPVsim methods manuscript. Specifically:
+| Script | Figure | Heavy step | Key artifacts |
+|---|---|---|---|
+| `plot_fig2.py` | Fig 2 — implied natural history | 1M-agent sim with custom analyzers | `fig2_age_causal_summary.csv`, `fig2_dwelltime_summary.csv`, `fig2_outcomes.csv` |
+| `plot_figS1.py` | Fig S1 — sexual behavior | Short sim with AFS / prop-married / snapshot analyzers | `model_sb_AFS.csv`, `model_sb_prop_married.csv`, `model_age_diffs.csv`, `model_casual.csv`, `partners.obj` |
+| `plot_figS2.py` | Fig S2 — calibration | Full calibration (10k trials) | `figS2_cancers_by_age.csv`, `figS2_cin_genotype_dist.csv`, `figS2_cancerous_genotype_dist.csv` + 3 target CSVs |
+| `plot_figS3.py` | Fig S3 — India cancer burden vs Globocan | Pre-computed `india_msim.obj` | `india_msim.obj` |
 
-#### `plot_fig2.py`
- - This script can be used to reproduce Figure 2.
+### Other scripts
 
-#### `plot_figS1.py` 
-- This script can be used to reproduce Figure S1.
+- `run_sim.py`: sim-building, calibration, sexual-behavior extraction (called by the `--run-sim` modes)
+- `save_figS3_baseline.py`: freezes figS3 plot-ready CSVs into a versioned baseline dir
+- `compare_fig2.py`: generates side-by-side fig2 comparison across baseline dirs
+- `utils.py`, `behavior_inputs.py`: supporting utilities and parameters
 
-#### `plot_figS2.py` 
-- This script can be used to reproduce Figure S2.
+## Cross-version comparison
 
-#### `plot_figS3.py` 
-- This script can be used to reproduce Figure S3.
+Each baseline lives under `results/<version>/` and contains CSVs (never pickles). To produce a side-by-side fig2 comparison:
 
-### Additional utility scripts
-- `utils.py` contains utilities for numerical calculations, processing data, and creating plots.
-- `plot_degree.py` plots the network degree distribution for casual partnerships.
+```bash
+python compare_fig2.py --baselines v2.2.6_baseline v2.3.0_baseline
+```
+
+When new hpvsim versions land, re-run the `--run-sim` steps against the new version and copy the resulting CSVs into a new baseline dir.
+
+## Inputs
+
+- `data/` — input data files (DHS debut/marriage, Globocan, IARC targets)
+- `behavior_inputs.py` — additional behavioral parameters
+
+## Further information
+
+See [hpvsim.org](https://hpvsim.org) and [docs.hpvsim.org](https://docs.hpvsim.org).
