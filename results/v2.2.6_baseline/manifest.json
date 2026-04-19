@@ -1,5 +1,5 @@
 {
-  "figures": ["fig2", "figS1", "figS3"],
+  "figures": ["fig2", "figS1", "figS2", "figS3"],
   "fig2": {
     "sources": ["fig2_age_causal_summary.csv", "fig2_dwelltime_summary.csv", "fig2_outcomes.csv"],
     "note": "Boxplot summary stats (Q1/median/Q3/whiskers) not raw events"
@@ -12,7 +12,15 @@
     "sources": ["figS3_hpvsim.csv", "figS3_globocan.csv"]
   },
   "figS2": {
-    "status": "pending VM calibration run"
+    "sources": [
+      "figS2_cancers_by_age.csv",
+      "figS2_cin_genotype_dist.csv",
+      "figS2_cancerous_genotype_dist.csv",
+      "figS2_target_cancers.csv",
+      "figS2_target_cin_genotype.csv",
+      "figS2_target_cancerous_genotype.csv"
+    ],
+    "note": "Extracted from india_calib.obj (VM run, not committed)"
   },
   "hpvsim_version": "2.2.6",
   "hpvsim_commit": "5cfba773272e48cb736284031471a88215c14879",
