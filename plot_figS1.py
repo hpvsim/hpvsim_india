@@ -54,15 +54,22 @@ def plot_sb(dist_type='lognormal', resfolder='results', outpath='figures/india_b
     ax.set_title('(A) Share of females who\n are sexually active')
 
     # Panel B: proportion married
-    dfraw = pd.read_csv('data/prop_married.csv')
-    df = dfraw.melt(id_vars=['Country', 'Survey'], value_name='Percentage', var_name='AgeRange')
     modeldf = pd.read_csv(f'{resfolder}/model_sb_prop_married.csv')
     modeldf['val'] = modeldf['val'] * 100
+    modeldf['AgeRange'] = modeldf['age'].astype(str) + '-' + (modeldf['age'] + 4).astype(str)
 
     colors = sc.gridcolors(1)
     ax = fig.add_subplot(gs00[1])
-    sns.scatterplot(ax=ax, data=df, x='AgeRange', y='Percentage')
-    sns.boxplot(data=modeldf, x='age', y='val', color=colors[0], ax=ax)
+    sns.boxplot(data=modeldf, x='AgeRange', y='val', color=colors[0], ax=ax,
+                order=sorted(modeldf['AgeRange'].unique(), key=lambda s: int(s.split('-')[0])))
+    try:
+        dfraw = pd.read_csv('data/prop_married.csv')
+        df = dfraw.melt(id_vars=['Country', 'Survey'], value_name='Percentage', var_name='AgeRange')
+        df_loc = df[df['Country'] == 'India']
+        if len(df_loc):
+            sns.scatterplot(ax=ax, data=df_loc, x='AgeRange', y='Percentage', color='k', marker='d', s=ms)
+    except FileNotFoundError:
+        pass
     ax.set_ylabel('Share')
     ax.set_xlabel('Age')
     ax.set_title('(B) Share of females\n who are married')
