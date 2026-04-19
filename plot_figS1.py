@@ -74,11 +74,10 @@ def plot_sb(dist_type='lognormal', resfolder='results', outpath='figures/india_b
     ax.set_xlabel('Age')
     ax.set_title('(B) Share of females\n who are married')
 
-    # Panel C: age differences between partners
-    agediffs = pd.read_csv(f'{resfolder}/model_age_diffs.csv')
+    # Panel C: age differences between partners (precomputed kde grid)
+    kde_df = pd.read_csv(f'{resfolder}/age_diffs_kde.csv')
     ax = fig.add_subplot(gs00[2])
-    sns.kdeplot(data=agediffs, color=colors[0], ax=ax)
-    ax.legend([], [], frameon=False)
+    ax.plot(kde_df['x'], kde_df['density'], color=colors[0])
     ax.set_xlim([-10, 30])
     ax.set_ylabel('Share')
     ax.set_xlabel('Male age - female age')
