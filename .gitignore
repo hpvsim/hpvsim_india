@@ -1,0 +1,25 @@
+# Migration: large sim outputs in versioned subdirs are regenerable, not committed
+# (plot-ready artifacts like .csv, .json, .npz should still be committed)
+raw_results/
+results/v*/*.obj
+results/v*/*.pkl
+results/v*/*.sim
+results/v*/*.msim
+
+# Raw fig2 per-event extractions — too large; commit summary CSVs instead
+results/fig2_age_causal.csv
+results/fig2_dwelltime.csv
+
+# Full calibration object — commit CSV extracts (figS2_*) instead
+results/india_calib.obj
+
+# Staging dir for pulled v1.0 .obj files (source of v1.0.0_published CSVs)
+results/raw_v1.0/
+results/*.zip
+
+# Plots are regenerated locally from CSVs
+figures/
+
+# Top-level results/*.csv are transient VM-run outputs; commit frozen snapshots
+# under results/v<version>_baseline/ (or similar) instead.
+results/*.csv

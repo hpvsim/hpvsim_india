@@ -1,56 +1,47 @@
 """
-Plot India metrics from HPVsim and Globocan
-"""
-import hpvsim as hpv
-import pylab as pl
-import pandas as pd
-import numpy as np
-import sciris as sc
-import utils as ut
-import seaborn as sns
-from matplotlib.ticker import FormatStrFormatter
+Plot India cancer burden: HPVsim vs Globocan.
 
+Loads plot-ready CSVs from a baseline dir. To regenerate from a fresh msim
+run, use save_figS3_baseline.py --outdir results/v<version>_baseline.
+"""
+import argparse
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import sciris as sc
+
+import utils as ut
 
 do_show = True
 
-# %% Functions
-def plot_india_burden():
 
+def plot_india_burden(resfolder, outpath='figures/figS3.png'):
     ut.set_font(size=16)
-    res = sc.loadobj(f'results/india_msim.obj')
-
+    hpvsim_df = pd.read_csv(f'{resfolder}/figS3_hpvsim.csv')
+    globocan_df = pd.read_csv(f'{resfolder}/figS3_globocan.csv')
     colors = sc.gridcolors(2)
 
-    globocan = pd.read_csv(f'data/globocan_asr_cancer_incidence.csv')
-
-    fig, ax = pl.subplots(1, 1, figsize=(10, 5))
-    start_year = 2005
-    ind = sc.findinds(res['year'], start_year)[0]
-    years = res['year'][ind:]
-
-    ax.plot(years, res['asr_cancer_incidence'].values[ind:], color=colors[0], label=f'HPVsim', marker='o')
-    ax.fill_between(years, res['asr_cancer_incidence'].low[ind:],
-                            res['asr_cancer_incidence'].high[ind:], color=colors[0], alpha=0.3)
-
-    gc_ind = sc.findinds(globocan['year'], start_year)[0]
-    ax.plot(globocan['year'][gc_ind:], globocan['asr_cancer_incidence'][gc_ind:], marker='s', color=colors[1], label='Globocan')
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+    ax.plot(hpvsim_df['year'], hpvsim_df['asr_cancer_incidence'],
+            color=colors[0], label='HPVsim', marker='o')
+    ax.fill_between(hpvsim_df['year'], hpvsim_df['asr_cancer_incidence_low'],
+                    hpvsim_df['asr_cancer_incidence_high'],
+                    color=colors[0], alpha=0.3)
+    ax.plot(globocan_df['year'], globocan_df['asr_cancer_incidence'],
+            marker='s', color=colors[1], label='Globocan')
     ax.set_ylabel('Age-standardized cancer incidence (per 100k)')
     ax.legend()
-    ax.set_ylim([0,25])
-    # ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-    # sc.SIticks(ax)
+    ax.set_ylim([0, 25])
     fig.tight_layout()
-    fig_name = f'figures/figS3.png'
-    sc.savefig(fig_name, dpi=100)
+    sc.savefig(outpath, dpi=100)
     if do_show:
-        pl.show()
+        plt.show()
 
-    return
 
-# %% Run as a script
 if __name__ == '__main__':
-
-
-    plot_india_burden()
-
-    print('Done.') 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--resfolder', default='results/v2.2.6_baseline')
+    parser.add_argument('--outpath', default='figures/figS3.png')
+    args = parser.parse_args()
+    plot_india_burden(resfolder=args.resfolder, outpath=args.outpath)
+    print('Done.')

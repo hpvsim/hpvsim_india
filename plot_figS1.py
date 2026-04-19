@@ -1,134 +1,127 @@
 """
-Plot sexual behavior data
+Plot sexual behavior data.
+
+Two modes:
+  python plot_figS1.py --run-sim   # run sim + extract sexual-behavior artifacts (VM)
+  python plot_figS1.py             # plot from saved CSVs (local)
 """
+import argparse
 
-# Import packages
-import sciris as sc
+import matplotlib.pyplot as plt
 import numpy as np
-import pylab as pl
 import pandas as pd
+import sciris as sc
 import seaborn as sns
-from scipy.stats import norm, lognorm
-import hpvsim as hpv
-import hpvsim.utils as hpu
 
-# Imports from this repository
-import utils as ut
 import run_sim as rs
+import utils as ut
 
 do_show = True
 
 
-def plot_sb(dist_type='lognormal'):
-    '''
-    Create plots of sexual behavior inputs and outputs
-    '''
-
+def plot_sb(dist_type='lognormal', resfolder='results', outpath='figures/india_behavior.png'):
     ut.set_font(15)
-    fig = pl.figure(layout="tight", figsize=(11, 10))
-
-    # Make 2 rows, with 3 panels in the top row and 2 in the bottom
+    fig = plt.figure(layout='tight', figsize=(11, 10))
     gs0 = fig.add_gridspec(2, 1)
     gs00 = gs0[0].subgridspec(1, 3)
     gs01 = gs0[1].subgridspec(1, 2)
     ms = 80
 
-    # Panel A: debut
+    # Panel A: age at first sex
     data_countries, dff, df2, rvs = ut.read_debut_data(dist_type=dist_type)
-    alldf = sc.loadobj(f'results/model_sb_AFS.obj')
+    alldf = pd.read_csv(f'{resfolder}/model_sb_AFS.csv')
     sex = 'Women'
     sk = 'f'
     dfw = dff[sex]
 
     ax = fig.add_subplot(gs00[0])
-    dfplot = dfw.loc[(dfw["AgeStr"]!=f'{sex} never')&(dfw["AgeStr"]!=f'{sex} 60')]
+    dfplot = dfw.loc[(dfw['AgeStr'] != f'{sex} never') & (dfw['AgeStr'] != f'{sex} 60')]
     dfmed = df2
 
     rv = rvs[sex]['India']
-    xx = np.arange(12,30.1,0.1)
-    xxx = np.arange(12,31,1)
+    xx = np.arange(12, 30.1, 0.1)
+    xxx = np.arange(12, 31, 1)
 
-    for cohort in alldf["cohort"].unique():
-        modely = np.array(alldf.loc[(alldf["cohort"]==cohort)][f'model_prop_{sk}'])
-        ax.plot(xxx, modely*100, 'b-', lw=1, alpha=0.3)
+    for cohort in alldf['cohort'].unique():
+        modely = alldf.loc[alldf['cohort'] == cohort, f'model_prop_{sk}'].values
+        ax.plot(xxx, modely * 100, 'b-', lw=1, alpha=0.3)
 
-    sns.scatterplot(ax=ax, data=dfplot, x="Age", y="Percentage", marker='d', s=ms, color='k')
-    sns.scatterplot(ax=ax, data=dfmed, x=f"{sex} median", y="y", marker='d', s=ms, color='k')
-    ax.plot(xx, rv.cdf(xx)*100, 'k--', lw=2)
-
+    sns.scatterplot(ax=ax, data=dfplot, x='Age', y='Percentage', marker='d', s=ms, color='k')
+    sns.scatterplot(ax=ax, data=dfmed, x=f'{sex} median', y='y', marker='d', s=ms, color='k')
+    ax.plot(xx, rv.cdf(xx) * 100, 'k--', lw=2)
     ax.set_ylabel('Share')
     ax.set_xlabel('Age')
     ax.set_title('(A) Share of females who\n are sexually active')
 
     # Panel B: proportion married
-    dfraw = pd.read_csv('data/prop_married.csv')
-    df = dfraw.melt(id_vars=['Country', 'Survey'], value_name='Percentage', var_name='AgeRange')
-    modeldf = sc.loadobj(f'results/model_sb_prop_married.obj')
-    modeldf.reset_index()
+    modeldf = pd.read_csv(f'{resfolder}/model_sb_prop_married.csv')
+    modeldf['val'] = modeldf['val'] * 100
+    modeldf['AgeRange'] = modeldf['age'].astype(str) + '-' + (modeldf['age'] + 4).astype(str)
 
     colors = sc.gridcolors(1)
-
     ax = fig.add_subplot(gs00[1])
-
-    sns.scatterplot(ax=ax, data=df, x="AgeRange", y="Percentage")
-
-    modeldf['val'] = modeldf['val'].apply(lambda x: x * 100)
-    sns.boxplot(data=modeldf, x="age", y="val", color=colors[0], ax=ax)
+    sns.boxplot(data=modeldf, x='AgeRange', y='val', color=colors[0], ax=ax,
+                order=sorted(modeldf['AgeRange'].unique(), key=lambda s: int(s.split('-')[0])))
+    try:
+        dfraw = pd.read_csv('data/prop_married.csv')
+        df = dfraw.melt(id_vars=['Country', 'Survey'], value_name='Percentage', var_name='AgeRange')
+        df_loc = df[df['Country'] == 'India']
+        if len(df_loc):
+            sns.scatterplot(ax=ax, data=df_loc, x='AgeRange', y='Percentage', color='k', marker='d', s=ms)
+    except FileNotFoundError:
+        pass
     ax.set_ylabel('Share')
     ax.set_xlabel('Age')
     ax.set_title('(B) Share of females\n who are married')
 
-    # Panel C of age diffs
-    agediffs = sc.loadobj(f'results/model_age_diffs.obj')
+    # Panel C: age differences between partners (precomputed kde grid)
+    kde_df = pd.read_csv(f'{resfolder}/age_diffs_kde.csv')
     ax = fig.add_subplot(gs00[2])
-
-    # Plot model
-    dfplot_m = agediffs
-    sns.kdeplot(data=dfplot_m, color=colors[0], ax=ax)
-    ax.legend([], [], frameon=False)
+    ax.plot(kde_df['x'], kde_df['density'], color=colors[0])
     ax.set_xlim([-10, 30])
-    ax.set_ylabel('')
-    ax.set_xlabel('')
     ax.set_ylabel('Share')
     ax.set_xlabel('Male age - female age')
     ax.set_title('(C) Age differences\n between partners')
 
-    ########################################
-    # Bottom row - degree distribution
-    ########################################
-    bins = np.concatenate([np.arange(21),[100]]) #np.array([0, 1, 2, 3, 45, 20, 100])
-    partners = sc.loadobj('results/partners.obj')
+    # Panels D & E: degree distribution (precomputed histogram)
+    partners_hist = pd.read_csv(f'{resfolder}/partners_hist.csv')
     axlabels = ['D', 'E']
-
-    for ai,slabel in enumerate(['females', 'males']):
-        sex = slabel[0]
-        counts, bins = np.histogram(partners[sex], bins=bins)
-        total = sum(counts)
-        counts = counts/total
-
+    for ai, slabel in enumerate(['females', 'males']):
+        s = slabel[0]
+        sub = partners_hist[partners_hist['sex'] == s].sort_values('bin')
         ax = fig.add_subplot(gs01[ai])
-        ax.bar(bins[:-1], counts)
-        ax.set_xlabel(f'Number of lifetime casual partners')
+        ax.bar(sub['bin'].values, sub['probability'].values)
+        ax.set_xlabel('Number of lifetime casual partners')
         ax.set_title(f'({axlabels[ai]}) Distribution of casual partners, {slabel}')
         ax.set_ylim([0, 1])
-        stats = f"Mean: {np.mean(partners[sex]):.1f}\n"
-        stats += f"Median: {np.median(partners[sex]):.1f}\n"
-        stats += f"Std: {np.std(partners[sex]):.1f}\n"
-        stats += f"%>20: {np.count_nonzero(partners[sex]>=20)/total*100:.2f}\n"
+        row = sub.iloc[0]
+        stats = (
+            f'Mean: {row["mean"]:.1f}\n'
+            f'Median: {row["median"]:.1f}\n'
+            f'Std: {row["std"]:.1f}\n'
+            f'%>20: {row["pct_gt_20"]:.2f}\n'
+        )
         ax.text(15, 0.5, stats)
 
-
     fig.tight_layout()
-    sc.savefig(f"figures/india_behavior.png", dpi=100)
+    sc.savefig(outpath, dpi=100)
     if do_show:
-        pl.show()
-
-    return
+        plt.show()
 
 
-#%% Run as a script
+# %% Run as a script
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run-sim', action='store_true',
+                        help='Run the sim and save sexual-behavior CSVs (VM-side)')
+    parser.add_argument('--resfolder', default='results/v2.2.6_baseline',
+                        help='Dir with plot-ready CSVs (for plot mode only)')
+    parser.add_argument('--figpath', default='figures/india_behavior.png')
+    args = parser.parse_args()
 
-    plot_sb()
-
-    print('Done.')
+    if args.run_sim:
+        rs.get_sb_from_sims()
+        print(f'Saved sexual-behavior CSVs to results/')
+    else:
+        plot_sb(resfolder=args.resfolder, outpath=args.figpath)
+        print('Done.')

@@ -21,7 +21,6 @@ do_shrink = True  # Do not keep people when running sims (saves memory)
 # Run settings
 n_trials    = [10000, 2][debug]  # How many trials to run for calibration
 n_workers   = [40, 1][debug]    # How many cores to use
-storage     = ["mysql://hpvsim_user@localhost/hpvsim_db", None][debug]  # Storage for calibrations
 
 # Save settings
 do_save = True
@@ -133,9 +132,7 @@ def run_calib(n_trials=None, n_workers=None, do_save=True, filestem=''):
     calib = hpv.Calibration(sim, calib_pars=None, genotype_pars=genotype_pars,
                             name=f'india_calib',
                             datafiles=datafiles,
-                            total_trials=n_trials, n_workers=n_workers,
-                            storage=storage
-                            )
+                            total_trials=n_trials, n_workers=n_workers)
     calib.calibrate()
     filename = f'india_calib{filestem}'
     if do_save:
@@ -157,6 +154,7 @@ def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
         analyzers=[ut.AFS(), ut.prop_married(), hpv.snapshot(timepoints=['2020'])],
         debug=debug,
         verbose=verbose,
+        do_save=False,
     )
 
     # Save output on age at first sex (AFS)
@@ -170,20 +168,22 @@ def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
         df['model_prop_m'] = a.prop_active_m[cs, :]
         dfs += df
     afs_df = pd.concat(dfs)
-    sc.saveobj(f'results/model_sb_AFS.obj', afs_df)
+    afs_df.to_csv(f'results/model_sb_AFS.csv', index=False)
 
     # Save output on proportion married
     a = sim.get_analyzer('prop_married')
     pm_df = a.df
-    sc.saveobj(f'results/model_sb_prop_married.obj', pm_df)
+    pm_df.to_csv(f'results/model_sb_prop_married.csv', index=False)
 
-    # Save output on age differences between partners
-    agediff_df = pd.DataFrame()
+    # Save age-differences as a precomputed KDE grid (300 rows) rather than raw events
+    from scipy.stats import gaussian_kde
     snapshot = sim.get_analyzer('snapshot')
     ppl = snapshot.snapshots[0]
-    age_diffs = ppl.contacts['m']['age_m'] - ppl.contacts['m']['age_f']
-    agediff_df['age_diffs'] = age_diffs
-    sc.saveobj(f'results/model_age_diffs.obj', agediff_df)
+    age_diffs = np.asarray(ppl.contacts['m']['age_m'] - ppl.contacts['m']['age_f'])
+    kde = gaussian_kde(age_diffs)
+    x = np.linspace(-15, 35, 300)
+    pd.DataFrame({'x': x, 'density': kde(x)}).to_csv(
+        f'results/age_diffs_kde.csv', index=False)
 
     # Save output on the number of casual relationships
     binspan = 5
@@ -217,7 +217,7 @@ def get_sb_from_sims(dist_type='lognormal', marriage_scale=1, debut_bias=[0, 0],
     datadict = dict(bins=allbins, partners=partners, counts=counts, popsize=allpopsize, shares=shares)
     casual_df = pd.DataFrame.from_dict(datadict)
 
-    sc.saveobj(f'results/model_casual.obj', casual_df)
+    casual_df.to_csv(f'results/model_casual.csv', index=False)
 
     return sim, afs_df, pm_df, agediff_df, casual_df
 
