@@ -175,7 +175,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-sim', action='store_true',
                         help='Run the sim and save CSVs (heavy, VM-side)')
-    parser.add_argument('--resfolder', default='results')
+    parser.add_argument('--resfolder', default='results/v2.2.6_baseline',
+                        help='Dir with plot-ready CSVs (for plot mode only)')
     parser.add_argument('--figpath', default='figures/fig2.png')
     args = parser.parse_args()
 
@@ -186,8 +187,8 @@ if __name__ == '__main__':
             n_agents=1e6,
             do_save=False,
         )
-        save_fig2_data(sim, resfolder=args.resfolder)
-        print(f'Saved fig2 CSVs to {args.resfolder}')
+        save_fig2_data(sim, resfolder='results')
+        print('Saved fig2 CSVs to results/ (copy to a versioned baseline dir to commit)')
     else:
         ac_summary = pd.read_csv(f'{args.resfolder}/fig2_age_causal_summary.csv')
         dw_summary = pd.read_csv(f'{args.resfolder}/fig2_dwelltime_summary.csv')

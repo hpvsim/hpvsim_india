@@ -83,26 +83,23 @@ def plot_sb(dist_type='lognormal', resfolder='results', outpath='figures/india_b
     ax.set_xlabel('Male age - female age')
     ax.set_title('(C) Age differences\n between partners')
 
-    # Panels D & E: degree distribution
-    bins = np.concatenate([np.arange(21), [100]])
-    partners = sc.loadobj(f'{resfolder}/partners.obj')
+    # Panels D & E: degree distribution (precomputed histogram)
+    partners_hist = pd.read_csv(f'{resfolder}/partners_hist.csv')
     axlabels = ['D', 'E']
-
     for ai, slabel in enumerate(['females', 'males']):
         s = slabel[0]
-        counts, bins = np.histogram(partners[s], bins=bins)
-        total = counts.sum()
-        counts = counts / total
+        sub = partners_hist[partners_hist['sex'] == s].sort_values('bin')
         ax = fig.add_subplot(gs01[ai])
-        ax.bar(bins[:-1], counts)
+        ax.bar(sub['bin'].values, sub['probability'].values)
         ax.set_xlabel('Number of lifetime casual partners')
         ax.set_title(f'({axlabels[ai]}) Distribution of casual partners, {slabel}')
         ax.set_ylim([0, 1])
+        row = sub.iloc[0]
         stats = (
-            f'Mean: {np.mean(partners[s]):.1f}\n'
-            f'Median: {np.median(partners[s]):.1f}\n'
-            f'Std: {np.std(partners[s]):.1f}\n'
-            f'%>20: {np.count_nonzero(partners[s] >= 20) / total * 100:.2f}\n'
+            f'Mean: {row["mean"]:.1f}\n'
+            f'Median: {row["median"]:.1f}\n'
+            f'Std: {row["std"]:.1f}\n'
+            f'%>20: {row["pct_gt_20"]:.2f}\n'
         )
         ax.text(15, 0.5, stats)
 
@@ -117,7 +114,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-sim', action='store_true',
                         help='Run the sim and save sexual-behavior CSVs (VM-side)')
-    parser.add_argument('--resfolder', default='results')
+    parser.add_argument('--resfolder', default='results/v2.2.6_baseline',
+                        help='Dir with plot-ready CSVs (for plot mode only)')
     parser.add_argument('--figpath', default='figures/india_behavior.png')
     args = parser.parse_args()
 

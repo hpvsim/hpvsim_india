@@ -19,3 +19,7 @@ results/*.zip
 
 # Plots are regenerated locally from CSVs
 figures/
+
+# Top-level results/*.csv are transient VM-run outputs; commit frozen snapshots
+# under results/v<version>_baseline/ (or similar) instead.
+results/*.csv
