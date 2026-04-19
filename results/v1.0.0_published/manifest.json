@@ -1,0 +1,30 @@
+{
+  "figures_available": ["figS1", "figS2"],
+  "figures_unavailable": {
+    "fig2": "No saved sim-with-analyzers from v1.0 era available",
+    "figS3": "No genuine v1.0 india_msim.obj available — the file in the zip was bit-identical to the Jan 2024 repo commit (likely v2.0+)",
+    "figS2_panel_A": "Same caveat as figS3 — Panel A pulls from india_msim.obj which is not truly v1.0"
+  },
+  "figS1": {
+    "sources": [
+      "model_sb_AFS.csv",
+      "model_sb_prop_married.csv",
+      "model_age_diffs.csv",
+      "model_casual.csv"
+    ],
+    "note": "Source .obj files dated Nov 2023, extracted from resultsv1.zip"
+  },
+  "figS2": {
+    "sources": [
+      "figS2_cancers_by_age.csv",
+      "figS2_cin_genotype_dist.csv",
+      "figS2_cancerous_genotype_dist.csv",
+      "figS2_target_cancers.csv",
+      "figS2_target_cin_genotype.csv",
+      "figS2_target_cancerous_genotype.csv"
+    ],
+    "note": "Extracted from india_calib.obj dated Nov 2023"
+  },
+  "extracted_on_hpvsim_version": "2.2.6",
+  "date": "2026-04-18"
+}

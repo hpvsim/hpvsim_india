@@ -13,5 +13,9 @@ results/fig2_dwelltime.csv
 # Full calibration object — commit CSV extracts (figS2_*) instead
 results/india_calib.obj
 
+# Staging dir for pulled v1.0 .obj files (source of v1.0.0_published CSVs)
+results/raw_v1.0/
+results/*.zip
+
 # Plots are regenerated locally from CSVs
 figures/
